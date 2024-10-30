@@ -4,33 +4,44 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Marketplace</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <h1>Welcome to the marketplace!</h1>
+    <div id="user">
+        <h2>Users</h2>
+        <ul id="user-list"></ul>
+    </div>
+    <div id="product">
+        <h2>Products</h2>
+        <ul id="product-list"></ul>
+    </div>
     <script>
-        const server = 'http://EC2-IP';
+        const server = 'http://<EC2-IP>'; // Replace <EC2-IP> with your EC2 instance's public IP or domain
+
         fetch(`${server}/example_user`)
             .then(response => response.json())
-            .then(user => {
-                const userDiv = document.getElementById('user');
-                user.forEach(user => {
+            .then(users => {
+                const userList = document.getElementById('user-list');
+                users.forEach(user => {
                     const userItem = document.createElement('li');
                     userItem.textContent = `User: ${user.user_name}, Email: ${user.email}`;
-                    userDiv.appendChild(userItem);
+                    userList.appendChild(userItem);
                 });
-            });
+            })
+            .catch(error => console.error('Error fetching users:', error));
 
         fetch(`${server}/example_product`)
             .then(response => response.json())
-            .then(product => {
-                const productDiv = document.getElementById('product');
-                product.forEach(product => {
+            .then(products => {
+                const productList = document.getElementById('product-list');
+                products.forEach(product => {
                     const productItem = document.createElement('li');
                     productItem.textContent = `Product: ${product.product_name}, Price: ${product.product_price}, Owner: ${product.product_owner}`;
-                    productDiv.appendChild(productItem);
+                    productList.appendChild(productItem);
                 });
-            });
+            })
+            .catch(error => console.error('Error fetching products:', error));
     </script>
 </body>
 </html>
