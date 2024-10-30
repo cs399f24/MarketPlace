@@ -60,7 +60,7 @@ def example_product():
 
 def launch_app():
     dotenv.load_dotenv()
-    app.run(host='0.0.0.0', port=80)
+    app.run(port=80, debug=True)
 
 if __name__ == "__main__":
     launch_app()

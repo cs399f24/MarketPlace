@@ -3,9 +3,8 @@ from botocore.exceptions import NoCredentialsError, PartialCredentialsError
 
 class DynamoDBMarketPlace:
     def __init__(self):
-        self.table_name = 'MarketPlaceDatabase'
-        self.dynamodb = boto3.resource('dynamodb', region_name='us-east-1')
-        self.table = self.dynamodb.Table(self.table_name)
+        dynamodb = boto3.resource('dynamodb', region_name='us-east-1')
+        self.table = dynamodb.Table('MarketPlaceDatabase')
     
     # Create a new user in the database
     def create_user(self, user_id, user_name, email):
