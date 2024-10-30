@@ -1,1 +1,5 @@
-Flask>=2.0.0
+flask
+gunicorn
+flask-cors
+python-dotenv
+boto3
