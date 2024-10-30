@@ -38,6 +38,29 @@ def create_app(MarketPlaceDB):
         response = MarketPlaceDB.get_product(product_id)
         return jsonify(response)
     
+    @app.route('/example_user', methods=['GET'])
+    def example_user():
+        user = [
+            {
+                "user_id": "1",
+                "user_name": "JohnDoe11",
+                "email": "JohnnyGotDatDoe@gmail.com"
+            }
+        ]
+        return jsonify(user)
+    
+    @app.route('/example_product', methods=['GET'])
+    def example_product():
+        product = [
+            {
+                "product_id": "1",
+                "product_name": "Laptop",
+                "product_price": "1000",
+                "product_owner": "JohnDoe11"
+            }
+        ]
+        return jsonify(product)
+    
     return app
 
 def launch_app():

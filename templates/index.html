@@ -8,5 +8,29 @@
 </head>
 <body>
     <h1>Welcome to the marketplace!</h1>
+    <script>
+        const server = 'http://EC2-IP';
+        fetch(`${server}/example_user`)
+            .then(response => response.json())
+            .then(user => {
+                const userDiv = document.getElementById('user');
+                user.forEach(user => {
+                    const userItem = document.createElement('li');
+                    userItem.textContent = `User: ${user.user_name}, Email: ${user.email}`;
+                    userDiv.appendChild(userItem);
+                });
+            });
+
+        fetch(`${server}/example_product`)
+            .then(response => response.json())
+            .then(product => {
+                const productDiv = document.getElementById('product');
+                product.forEach(product => {
+                    const productItem = document.createElement('li');
+                    productItem.textContent = `Product: ${product.product_name}, Price: ${product.product_price}, Owner: ${product.product_owner}`;
+                    productDiv.appendChild(productItem);
+                });
+            });
+    </script>
 </body>
 </html>
