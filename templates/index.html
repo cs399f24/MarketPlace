@@ -5,6 +5,39 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Marketplace</title>
     <link rel="stylesheet" href="style.css">
+    <script>
+        const server = 'http://<EC2-IP>'; // Replace <EC2-IP> with your EC2 instance's public IP or domain
+
+        async function fetchData(endpoint, elementId) {
+            try {
+                const response = await fetch(`${server}/${endpoint}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    const listElement = document.getElementById(elementId);
+                    listElement.innerHTML = ''; // Clear existing content
+                    data.forEach(item => {
+                        const listItem = document.createElement('li');
+                        if (endpoint === 'example_user') {
+                            listItem.textContent = `User: ${item.user_name}, Email: ${item.email}`;
+                        } else if (endpoint === 'example_product') {
+                            listItem.textContent = `Product: ${item.product_name}, Price: ${item.product_price}, Owner: ${item.product_owner}`;
+                        }
+                        listElement.appendChild(listItem);
+                    });
+                } else {
+                    alert(`Failed to fetch ${endpoint}`);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert(`An error occurred while fetching ${endpoint}`);
+            }
+        }
+
+        window.onload = function() {
+            fetchData('example_user', 'user-list');
+            fetchData('example_product', 'product-list');
+        };
+    </script>
 </head>
 <body>
     <h1>Welcome to the marketplace!</h1>
@@ -16,23 +49,5 @@
         <h2>Products</h2>
         <ul id="product-list"></ul>
     </div>
-    <script>
-        const server = 'http://<EC2-IP>'; // Replace <EC2-IP> with your EC2 instance's public IP or domain
-
-        async function getExampleUser() {
-            const response = await fetch(`${server}/users/1`);
-            const user = await response.json();
-            console.log(user);
-        }
-
-        async function getExampleProduct() {
-            const response = await fetch(`${server}/products/1`);
-            const product = await response.json();
-            console.log(product);
-        }
-
-        getExampleUser();
-        getExampleProduct();
-    </script>
 </body>
 </html>
