@@ -1,9 +1,12 @@
 #!/bin/bash
-yum install -y git
-git clone https://github.com/cs399f24/MarketPlace.git 
-cd MarketPlace
+yum update -y
+yum install -y git python3
+git clone https://github.com/cs399f24/MarketPlace.git
+cd MarketPlace || exit 1  # Exit if cd fails
 python3 -m venv .venv
-.venv/bin/pip install -r requirements.txt
-cp marketplace.service /etc/systemd/system
+source .venv/bin/activate
+pip install -r requirements.txt
+cp marketplace.service /etc/systemd/system/
+systemctl daemon-reload
 systemctl enable marketplace
 systemctl start marketplace
