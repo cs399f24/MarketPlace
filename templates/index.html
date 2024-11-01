@@ -3,41 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Marketplace</title>
-    <link rel="stylesheet" href="style.css">
-    <script>
-        const server = 'http://<EC2-IP>'; // Replace <EC2-IP> with your EC2 instance's public IP or domain
+<title>Marketplace</title>
+<link rel="stylesheet" href="style.css">
+<script>
+    const server = 'http://<EC2-IP>'; // Replace <EC2-IP> with your EC2 instance's public IP or domain
 
-        async function fetchData(endpoint, elementId) {
-            try {
-                const response = await fetch(`${server}/${endpoint}`);
-                if (response.ok) {
-                    const data = await response.json();
-                    const listElement = document.getElementById(elementId);
-                    listElement.innerHTML = ''; // Clear existing content
-                    data.forEach(item => {
-                        const listItem = document.createElement('li');
-                        if (endpoint === 'example_user') {
-                            listItem.textContent = `User: ${item.user_name}, Email: ${item.email}`;
-                        } else if (endpoint === 'example_product') {
-                            listItem.textContent = `Product: ${item.product_name}, Price: ${item.product_price}, Owner: ${item.product_owner}`;
-                        }
-                        listElement.appendChild(listItem);
-                    });
-                } else {
-                    alert(`Failed to fetch ${endpoint}`);
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                alert(`An error occurred while fetching ${endpoint}`);
+    async function fetchUserData() {
+        try {
+            const response = await fetch(`${server}/example_user`);
+            if (response.ok) {
+                const data = await response.json();
+                const listElement = document.getElementById('user-list');
+                listElement.innerHTML = ''; // Clear existing content
+                data.forEach(item => {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = `User: ${item.user_name}, Email: ${item.email}`;
+                    listElement.appendChild(listItem);
+                });
+            } else {
+                alert('Failed to fetch user data');
             }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('An error occurred while fetching user data');
         }
+    }
 
-        window.onload = function() {
-            fetchData('example_user', 'user-list');
-            fetchData('example_product', 'product-list');
-        };
-    </script>
+    async function fetchProductData() {
+        try {
+            const response = await fetch(`${server}/example_product`);
+            if (response.ok) {
+                const data = await response.json();
+                const listElement = document.getElementById('product-list');
+                listElement.innerHTML = ''; // Clear existing content
+                data.forEach(item => {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = `Product: ${item.product_name}, Price: ${item.product_price}, Owner: ${item.product_owner}`;
+                    listElement.appendChild(listItem);
+                });
+            } else {
+                alert('Failed to fetch product data');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('An error occurred while fetching product data');
+        }
+    }
+
+    window.onload = function() {
+        fetchUserData();
+        fetchProductData();
+    };
+</script>
 </head>
 <body>
     <h1>Welcome to the marketplace!</h1>
