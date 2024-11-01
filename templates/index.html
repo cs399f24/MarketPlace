@@ -6,26 +6,25 @@
 <title>Marketplace</title>
 <link rel="stylesheet" href="style.css">
 <script>
-    const server = 'http://<EC2-IP>'; // Replace <EC2-IP> with your EC2 instance's public IP or domain
+    const server = 'http://18.232.101.19'; // Replace <EC2-IP> with your EC2 instance's public IP or domain
 
     async function fetchUserData() {
         try {
             const response = await fetch(`${server}/example_user`);
-            if (response.ok) {
-                const data = await response.json();
-                const listElement = document.getElementById('user-list');
-                listElement.innerHTML = ''; // Clear existing content
-                data.forEach(item => {
-                    const listItem = document.createElement('li');
-                    listItem.textContent = `User: ${item.user_name}, Email: ${item.email}`;
-                    listElement.appendChild(listItem);
-                });
-            } else {
-                alert('Failed to fetch user data');
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
             }
+            const data = await response.json();
+            console.log(data); // Inspect the data structure
+
+            // Since data is a single object, access its properties directly
+            const listItem = document.createElement('li');
+            listItem.textContent = `User: ${data.user_name}, Email: ${data.email}`;
+            const listElement = document.getElementById('user-list'); // Make sure this ID matches your HTML
+            listElement.appendChild(listItem);
+
         } catch (error) {
-            console.error('Error:', error);
-            alert('An error occurred while fetching user data');
+            console.error('Error fetching user data:', error);
         }
     }
 
@@ -36,11 +35,11 @@
                 const data = await response.json();
                 const listElement = document.getElementById('product-list');
                 listElement.innerHTML = ''; // Clear existing content
-                data.forEach(item => {
-                    const listItem = document.createElement('li');
-                    listItem.textContent = `Product: ${item.product_name}, Price: ${item.product_price}, Owner: ${item.product_owner}`;
-                    listElement.appendChild(listItem);
-                });
+            
+                // Since data is a single object, access its properties directly
+                const listItem = document.createElement('li');
+                listItem.textContent = `Product: ${data.product_name}, Price: ${data.product_price}, Owner: ${data.product_owner}`;
+                listElement.appendChild(listItem);
             } else {
                 alert('Failed to fetch product data');
             }
