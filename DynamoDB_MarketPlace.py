@@ -1,3 +1,4 @@
+import uuid
 import boto3
 from botocore.exceptions import NoCredentialsError, PartialCredentialsError
 
@@ -8,6 +9,7 @@ class DynamoDBMarketPlace:
     
     # Create a new user in the database
     def create_user(self, user_id, user_name, email):
+        user_id = str(uuid.uuid4())  # Generate a unique user ID
         try:
             response = self.table.put_item(
                 Item={
@@ -25,6 +27,7 @@ class DynamoDBMarketPlace:
 
     # Create a new product in the database
     def create_product(self, product_id, product_name, product_price, product_owner):
+        product_id = str(uuid.uuid4())  # Generate a unique product ID
         try:
             response = self.table.put_item(
                 Item={
