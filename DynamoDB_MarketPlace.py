@@ -26,7 +26,7 @@ class DynamoDBMarketPlace:
             return None
 
     # Create a new product in the database
-    def create_product(self, product_id, product_name, product_price, product_owner):
+    def create_product(self, product_name, product_price, product_owner):
         product_id = str(uuid.uuid4())  # Generate a unique product ID
         try:
             response = self.table.put_item(
@@ -68,6 +68,34 @@ class DynamoDBMarketPlace:
                 }
             )
             return response.get('Item')
+        except (NoCredentialsError, PartialCredentialsError) as e:
+            print(f"Credentials error: {e}")
+            return None
+        
+    # Get all users from the database
+    def get_all_users(self):
+        try:
+            response = self.table.query(
+                KeyConditionExpression='PK = :pk',
+                ExpressionAttributeValues={
+                    ':pk': 'USER'
+                }
+            )
+            return response.get('Items')
+        except (NoCredentialsError, PartialCredentialsError) as e:
+            print(f"Credentials error: {e}")
+            return None
+        
+    # Get all products from the database
+    def get_all_products(self):
+        try:
+            response = self.table.query(
+                KeyConditionExpression='PK = :pk',
+                ExpressionAttributeValues={
+                    ':pk': 'PRODUCT'
+                }
+            )
+            return response.get('Items')
         except (NoCredentialsError, PartialCredentialsError) as e:
             print(f"Credentials error: {e}")
             return None

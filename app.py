@@ -36,14 +36,24 @@ def create_app(db):
 
     @app.route('/get_user', methods=['GET'])
     def get_user():
-        user_id = request.args.get('user_id')
-        response = db.get_user(user_id)
+        user_name = request.args.get('user_name')
+        response = db.get_user(user_name)
+        return jsonify(response)
+    
+    @app.route('/get_all_users', methods=['GET'])
+    def get_all_users():
+        response = db.get_all_users()
         return jsonify(response)
 
     @app.route('/get_product', methods=['GET'])
     def get_product():
-        product_id = request.args.get('product_id')
-        response = db.get_product(product_id)
+        product_name = request.args.get('product_name')
+        response = db.get_product(product_name)
+        return jsonify(response)
+    
+    @app.route('/get_all_products', methods=['GET'])
+    def get_all_products():
+        response = db.get_all_products()
         return jsonify(response)
 
     @app.route('/example_user', methods=['GET'])
