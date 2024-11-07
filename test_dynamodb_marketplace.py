@@ -37,6 +37,22 @@ def test_create_product():
     else:
         print("Failed to create product.")
 
+def test_get_all_users():
+    # Create an instance of the DynamoDBMarketPlace class
+    marketplace = DynamoDBMarketPlace()
+
+    # Call the get_all_users method
+    users = marketplace.get_all_users()
+
+    # Check if the users list is not None and print the users
+    if users is not None:
+        print("Users retrieved successfully.")
+        for user in users:
+            print(user)
+    else:
+        print("Failed to retrieve users.")
+
 if __name__ == "__main__":
     test_create_user()
     test_create_product()
+    test_get_all_users()

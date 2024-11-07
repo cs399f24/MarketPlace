@@ -1,6 +1,7 @@
 import uuid
 import boto3
 from botocore.exceptions import NoCredentialsError, PartialCredentialsError
+from boto3.dynamodb.conditions import Attr
 
 class DynamoDBMarketPlace:
     def __init__(self):
@@ -75,11 +76,8 @@ class DynamoDBMarketPlace:
     # Get all users from the database
     def get_all_users(self):
         try:
-            response = self.table.query(
-                KeyConditionExpression='PK = :pk',
-                ExpressionAttributeValues={
-                    ':pk': 'USER'
-                }
+            response = self.table.scan(
+                FilterExpression=Attr('Type').contains('User')
             )
             return response.get('Items')
         except (NoCredentialsError, PartialCredentialsError) as e:
@@ -89,11 +87,8 @@ class DynamoDBMarketPlace:
     # Get all products from the database
     def get_all_products(self):
         try:
-            response = self.table.query(
-                KeyConditionExpression='PK = :pk',
-                ExpressionAttributeValues={
-                    ':pk': 'PRODUCT'
-                }
+            response = self.table.scan(
+                FilterExpression=Attr('Type').contains('Product')
             )
             return response.get('Items')
         except (NoCredentialsError, PartialCredentialsError) as e:
