@@ -23,7 +23,7 @@
             // Iterate over the array of users and create list items for each
             data.forEach(user => {
                 const listItem = document.createElement('li');
-                listItem.textContent = `User: ${user.user_name}, Email: ${user.email}`;
+                listItem.textContent = `User: ${user.UserName}, Email: ${user.Email}`;
                 listElement.appendChild(listItem);
             });
 
@@ -47,7 +47,7 @@
             // Iterate over the array of products and create list items for each
             data.forEach(product => {
                 const listItem = document.createElement('li');
-                listItem.textContent = `Product: ${product.product_name}, Price: ${product.product_price}, Owner: ${product.product_owner}`;
+                listItem.textContent = `Product: ${product.ProductName}, Price: ${product.ProductPrice}, Owner: ${product.ProductOwner}`;
                 listElement.appendChild(listItem);
             });
 
