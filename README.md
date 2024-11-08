@@ -1,6 +1,9 @@
 # MarketPlace
+## Overview
+An online web application that allows users to interact with each other in a virtual marketplace to buy and sell products.
 
-
+## System Architecture
+![System Diagram](https://github.com/cs399f24/MarketPlace/blob/main/project_structure.png)
 
 ## Local Deployment:
 
