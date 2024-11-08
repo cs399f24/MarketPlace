@@ -1,6 +1,8 @@
 # MarketPlace
 
-Local Deployment:
+
+
+## Local Deployment:
 
 * Set up a virtual environment
 
@@ -12,7 +14,7 @@ Local Deployment:
 
 * Stop using `CRTL+C` as prompted
 
-AWS Deployment:
+## AWS Deployment:
 
 * Create AWS VPC:
      * Select VPC and more
