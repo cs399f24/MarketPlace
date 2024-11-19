@@ -5,31 +5,31 @@
     <title>Marketplace</title>
     <link rel="stylesheet" href="style.css">
     <script>
-        const server = 'https://<API-GATEWAY-ENDPOINT>'; // Replace <API-GATEWAY-ENDPOINT> with your API Gateway endpoint
+        const server = '<API-GATEWAY-ENDPOINT>'; // Replace <API-GATEWAY-ENDPOINT> with your API Gateway endpoint
 
-        async function fetchUserData() {
-            try {
-                const response = await fetch(`${server}/get_all_users`);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-                const data = await response.json();
-                console.log(data); // Inspect the data structure
+        // async function fetchUserData() {
+        //     try {
+        //         const response = await fetch(`${server}/get_all_users`);
+        //         if (!response.ok) {
+        //             throw new Error(`HTTP error! Status: ${response.status}`);
+        //         }
+        //         const data = await response.json();
+        //         console.log(data); // Inspect the data structure
 
-                const listElement = document.getElementById('user-list'); // Make sure this ID matches your HTML
-                listElement.innerHTML = ''; // Clear existing content
+        //         const listElement = document.getElementById('user-list'); // Make sure this ID matches your HTML
+        //         listElement.innerHTML = ''; // Clear existing content
 
-                // Iterate over the array of users and create list items for each
-                data.forEach(user => {
-                    const listItem = document.createElement('li');
-                    listItem.textContent = `User: ${user.UserName}, Email: ${user.Email}`;
-                    listElement.appendChild(listItem);
-                });
+        //         // Iterate over the array of users and create list items for each
+        //         data.forEach(user => {
+        //             const listItem = document.createElement('li');
+        //             listItem.textContent = `User: ${user.UserName}, Email: ${user.Email}`;
+        //             listElement.appendChild(listItem);
+        //         });
 
-            } catch (error) {
-                console.error('Error fetching user data:', error);
-            }
-        }
+        //     } catch (error) {
+        //         console.error('Error fetching user data:', error);
+        //     }
+        // }
 
         async function fetchProductData() {
             try {
