@@ -37,8 +37,17 @@
                 if (!response.ok) {
                     throw new Error(`HTTP error! Status: ${response.status}`);
                 }
-                const data = await response.json();
-                console.log(data); // Inspect the data structure
+                const responseData = await response.json(); // Get the response as a JSON object
+                console.log('Response data:', responseData); // Log the response data
+
+                let data;
+                try {
+                    data = JSON.parse(responseData.body); // Parse the JSON string in the body into a JavaScript object
+                    console.log('Parsed data:', data); // Log the parsed data
+                } catch (parseError) {
+                    console.error('Error parsing JSON:', parseError);
+                    return;
+                }
 
                 const listElement = document.getElementById('product-list'); // Make sure this ID matches your HTML
                 listElement.innerHTML = ''; // Clear existing content

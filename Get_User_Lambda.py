@@ -36,7 +36,11 @@ def lambda_handler(event, context):
     if user is not None:
         return {
             'statusCode': 200,
-            'body': json.dumps(user)
+            'body': json.dumps(user),
+            'headers': {
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*'
+            }
         }
     else:
         return {

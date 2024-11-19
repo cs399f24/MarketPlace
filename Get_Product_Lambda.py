@@ -35,7 +35,11 @@ def lambda_handler(event, context):
     if product is not None:
         return {
             'statusCode': 200,
-            'body': json.dumps(product)
+            'body': json.dumps(product),
+            'headers': {
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*'
+            }
         }
     else:
         return {
