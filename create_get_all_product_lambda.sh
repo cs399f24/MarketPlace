@@ -3,7 +3,7 @@
 # Set Lambda function name and role name
 FUNCTION_NAME="getAllProducts"
 ROLE_NAME="labRole"
-ZIP_FILE="Get_All_Products_Lambda.zip"
+ZIP_FILE=".Get_All_Products_Lambda.zip"
 PYTHON_FILE="Get_All_Products_Lambda.py"
 
 # Check if the Lambda function already exists

@@ -3,7 +3,7 @@
 # Set Lambda function name and role name
 FUNCTION_NAME="createUser"
 ROLE_NAME="labRole"
-ZIP_FILE="Post_User_Lambda.zip"
+ZIP_FILE=".Post_User_Lambda.zip"
 PYTHON_FILE="Post_User_Lambda.py"
 
 # Check if the Lambda function already exists
