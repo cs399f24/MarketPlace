@@ -1,0 +1,7 @@
+# Ignore all ZIP files
+*.zip
+
+# Other files and directories to ignore
+node_modules/
+.env
+.DS_Store
