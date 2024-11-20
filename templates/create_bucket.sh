@@ -6,16 +6,16 @@ REGION="us-east-1"
 
 # Create the S3 bucket
 echo "Creating S3 bucket: $BUCKET_NAME"
-aws s3api create-bucket --bucket $BUCKET_NAME --region $REGION --create-bucket-configuration LocationConstraint=$REGION
+aws s3api create-bucket --bucket $BUCKET_NAME --region $REGION 
 
 # Enable static website hosting on the bucket
 echo "Enabling static website hosting on the bucket"
 aws s3 website s3://$BUCKET_NAME/ --index-document index.html
 
-# Upload the index.html and styles.css files (make sure these files exist in the current directory)
-echo "Uploading index.html and styles.css to the bucket"
+# Upload the index.html and style.css files (make sure these files exist in the current directory)
+echo "Uploading index.html and style.css to the bucket"
 aws s3 cp index.html s3://$BUCKET_NAME/index.html
-aws s3 cp styles.css s3://$BUCKET_NAME/styles.css
+aws s3 cp style.css s3://$BUCKET_NAME/style.css
 
 # Set the proper bucket policy to allow public access to the files
 echo "Setting bucket policy to allow public read access"
