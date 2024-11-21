@@ -28,7 +28,7 @@ zip $ZIP_FILE $PYTHON_FILE
 echo "Creating Lambda function '$FUNCTION_NAME'..."
 aws lambda create-function \
   --function-name $FUNCTION_NAME \
-  --runtime python3.9 \
+  --runtime python3.13 \
   --role $ROLE \
   --zip-file fileb://$ZIP_FILE \
   --handler Get_All_Products_Lambda.lambda_handler \

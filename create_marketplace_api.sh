@@ -14,9 +14,6 @@ REGION="us-east-1"
 # Get the AWS account ID
 ACCOUNT_ID=$(aws sts get-caller-identity --query "Account" --output text)
 
-# Set the IAM role for API Gateway
-API_GW_ROLE="LabRole"
-
 # Create the API Gateway
 echo "Creating API Gateway: $API_NAME"
 API_ID=$(aws apigateway create-rest-api \
@@ -25,13 +22,6 @@ API_ID=$(aws apigateway create-rest-api \
   --query "id" --output text)
 
 echo "API Gateway '$API_NAME' created with ID: $API_ID"
-
-# Set the execution role for API Gateway
-echo "Assigning role $API_GW_ROLE to API Gateway"
-aws apigateway update-rest-api \
-  --rest-api-id $API_ID \
-  --region $REGION \
-  --patch-operations op=replace,path=/policy,value="arn:aws:iam::$ACCOUNT_ID:role/$API_GW_ROLE"
 
 # Get the root resource ID
 ROOT_RESOURCE_ID=$(aws apigateway get-resources \
@@ -57,6 +47,14 @@ aws apigateway put-method \
   --http-method POST \
   --authorization-type NONE
 
+# Add Method Response for 200 status code
+aws apigateway put-method-response \
+  --rest-api-id $API_ID \
+  --region $REGION \
+  --resource-id $USERS_RESOURCE_ID \
+  --http-method POST \
+  --status-code 200
+
 # Integrate POST method with createUser Lambda function (Non-Proxy)
 aws apigateway put-integration \
   --rest-api-id $API_ID \
@@ -67,14 +65,22 @@ aws apigateway put-integration \
   --type AWS \
   --uri arn:aws:apigateway:$REGION:lambda:path/2015-03-31/functions/arn:aws:lambda:$REGION:$ACCOUNT_ID:function:$LAMBDA_CREATE_USER/invocations
 
-# Add resource-based permission for API Gateway to invoke the Lambda function
+# Add Integration Response for 200 status code
+aws apigateway put-integration-response \
+  --rest-api-id $API_ID \
+  --region $REGION \
+  --resource-id $USERS_RESOURCE_ID \
+  --http-method POST \
+  --status-code 200 \
+  --selection-pattern ""
+
+# Add resource-based permission for API Gateway to invoke the createUser Lambda function
 echo "Adding permission for API Gateway to invoke createUser Lambda"
 aws lambda add-permission \
   --function-name $LAMBDA_CREATE_USER \
   --principal apigateway.amazonaws.com \
   --statement-id "api-gateway-access-createUser" \
   --action "lambda:InvokeFunction" \
-  --condition "StringLike" \
   --source-arn arn:aws:execute-api:$REGION:$ACCOUNT_ID:$API_ID/*/POST/users
 
 # Create GET method for getUser
@@ -87,6 +93,14 @@ aws apigateway put-method \
   --authorization-type NONE \
   --request-parameters "method.request.path.user_name=true"
 
+# Add Method Response for 200 status code
+aws apigateway put-method-response \
+  --rest-api-id $API_ID \
+  --region $REGION \
+  --resource-id $USERS_RESOURCE_ID \
+  --http-method GET \
+  --status-code 200
+
 # Integrate GET method with getUser Lambda function (Non-Proxy)
 aws apigateway put-integration \
   --rest-api-id $API_ID \
@@ -96,6 +110,15 @@ aws apigateway put-integration \
   --integration-http-method GET \
   --type AWS \
   --uri arn:aws:apigateway:$REGION:lambda:path/2015-03-31/functions/arn:aws:lambda:$REGION:$ACCOUNT_ID:function:$LAMBDA_GET_USER/invocations
+
+# Add Integration Response for 200 status code
+aws apigateway put-integration-response \
+  --rest-api-id $API_ID \
+  --region $REGION \
+  --resource-id $USERS_RESOURCE_ID \
+  --http-method GET \
+  --status-code 200 \
+  --selection-pattern ""
 
 # Add resource-based permission for API Gateway to invoke the getUser Lambda function
 echo "Adding permission for API Gateway to invoke getUser Lambda"
@@ -124,6 +147,14 @@ aws apigateway put-method \
   --http-method POST \
   --authorization-type NONE
 
+# Add Method Response for 200 status code
+aws apigateway put-method-response \
+  --rest-api-id $API_ID \
+  --region $REGION \
+  --resource-id $PRODUCTS_RESOURCE_ID \
+  --http-method POST \
+  --status-code 200
+
 # Integrate POST method with createProduct Lambda function (Non-Proxy)
 aws apigateway put-integration \
   --rest-api-id $API_ID \
@@ -133,6 +164,15 @@ aws apigateway put-integration \
   --integration-http-method POST \
   --type AWS \
   --uri arn:aws:apigateway:$REGION:lambda:path/2015-03-31/functions/arn:aws:lambda:$REGION:$ACCOUNT_ID:function:$LAMBDA_CREATE_PRODUCT/invocations
+
+# Add Integration Response for 200 status code
+aws apigateway put-integration-response \
+  --rest-api-id $API_ID \
+  --region $REGION \
+  --resource-id $PRODUCTS_RESOURCE_ID \
+  --http-method POST \
+  --status-code 200 \
+  --selection-pattern ""
 
 # Add resource-based permission for API Gateway to invoke the createProduct Lambda function
 echo "Adding permission for API Gateway to invoke createProduct Lambda"
@@ -153,6 +193,14 @@ aws apigateway put-method \
   --authorization-type NONE \
   --request-parameters "method.request.path.product_id=true"
 
+# Add Method Response for 200 status code
+aws apigateway put-method-response \
+  --rest-api-id $API_ID \
+  --region $REGION \
+  --resource-id $PRODUCTS_RESOURCE_ID \
+  --http-method GET \
+  --status-code 200
+
 # Integrate GET method with getProduct Lambda function (Non-Proxy)
 aws apigateway put-integration \
   --rest-api-id $API_ID \
@@ -162,6 +210,15 @@ aws apigateway put-integration \
   --integration-http-method GET \
   --type AWS \
   --uri arn:aws:apigateway:$REGION:lambda:path/2015-03-31/functions/arn:aws:lambda:$REGION:$ACCOUNT_ID:function:$LAMBDA_GET_PRODUCT/invocations
+
+# Add Integration Response for 200 status code
+aws apigateway put-integration-response \
+  --rest-api-id $API_ID \
+  --region $REGION \
+  --resource-id $PRODUCTS_RESOURCE_ID \
+  --http-method GET \
+  --status-code 200 \
+  --selection-pattern ""
 
 # Add resource-based permission for API Gateway to invoke the getProduct Lambda function
 echo "Adding permission for API Gateway to invoke getProduct Lambda"
@@ -190,6 +247,14 @@ aws apigateway put-method \
   --http-method GET \
   --authorization-type NONE
 
+# Add Method Response for 200 status code
+aws apigateway put-method-response \
+  --rest-api-id $API_ID \
+  --region $REGION \
+  --resource-id $GET_ALL_PRODUCTS_RESOURCE_ID \
+  --http-method GET \
+  --status-code 200
+
 # Integrate GET method with getAllProducts Lambda function (Non-Proxy)
 aws apigateway put-integration \
   --rest-api-id $API_ID \
@@ -199,6 +264,15 @@ aws apigateway put-integration \
   --integration-http-method GET \
   --type AWS \
   --uri arn:aws:apigateway:$REGION:lambda:path/2015-03-31/functions/arn:aws:lambda:$REGION:$ACCOUNT_ID:function:$LAMBDA_GET_ALL_PRODUCTS/invocations
+
+# Add Integration Response for 200 status code
+aws apigateway put-integration-response \
+  --rest-api-id $API_ID \
+  --region $REGION \
+  --resource-id $GET_ALL_PRODUCTS_RESOURCE_ID \
+  --http-method GET \
+  --status-code 200 \
+  --selection-pattern ""
 
 # Add resource-based permission for API Gateway to invoke the getAllProducts Lambda function
 echo "Adding permission for API Gateway to invoke getAllProducts Lambda"
