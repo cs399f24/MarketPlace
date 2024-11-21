@@ -127,7 +127,7 @@ aws lambda add-permission \
   --principal apigateway.amazonaws.com \
   --statement-id "api-gateway-access-getUser" \
   --action "lambda:InvokeFunction" \
-  --source-arn arn:aws:execute-api:$REGION:$ACCOUNT_ID:$API_ID/*/GET/users/{user_name}
+  --source-arn arn:aws:execute-api:$REGION:$ACCOUNT_ID:$API_ID/*/GET/users
 
 # Create '/products' resource for createProduct, getProduct, and getAllProducts
 echo "Creating '/products' resource"
@@ -227,7 +227,7 @@ aws lambda add-permission \
   --principal apigateway.amazonaws.com \
   --statement-id "api-gateway-access-getProduct" \
   --action "lambda:InvokeFunction" \
-  --source-arn arn:aws:execute-api:$REGION:$ACCOUNT_ID:$API_ID/*/GET/products/{product_id}
+  --source-arn arn:aws:execute-api:$REGION:$ACCOUNT_ID:$API_ID/*/GET/products
 
 # Create '/products/get_all_products' resource for getAllProducts
 echo "Creating '/products/get_all_products' resource"
