@@ -34,7 +34,7 @@ An online web application that allows users to interact with each other in a vir
      * Acknowledge the warning message
      * Everything else is default, create bucket
 
-## Advanced AWS Deployment
+## Advanced AWS Deployment:
 
 * Create Cloud9 Environment
      * Set the environment name (eg. MarketPlace Serve)
