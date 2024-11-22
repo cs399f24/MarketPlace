@@ -1,10 +1,10 @@
 #!/bin/bash
 
 # Set Lambda function name and role name
-FUNCTION_NAME="getProduct"
+FUNCTION_NAME="createProduct"
 ROLE_NAME="LabRole"
-ZIP_FILE=".Get_Product_Lambda.zip"
-PYTHON_FILE="Get_Product_Lambda.py"
+ZIP_FILE="../zip_files/Post_Product_Lambda.zip"
+PYTHON_FILE="Post_Product_Lambda.py"
 
 # Check if the Lambda function already exists
 if aws lambda get-function --function-name $FUNCTION_NAME >/dev/null 2>&1; then
@@ -31,7 +31,7 @@ aws lambda create-function \
   --runtime python3.13 \
   --role $ROLE \
   --zip-file fileb://$ZIP_FILE \
-  --handler Get_Product_Lambda.lambda_handler \
+  --handler Post_Product_Lambda.lambda_handler \
   --region us-east-1
 
 # Wait for the function to be created and active

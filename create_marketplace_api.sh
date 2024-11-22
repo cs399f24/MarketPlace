@@ -33,106 +33,106 @@ ROOT_RESOURCE_ID=$(aws apigateway get-resources \
   --query "items[?path=='/'].id" --output text)
 
 # Create '/users' resource for createUser and getUser
-echo "Creating '/users' resource"
-USERS_RESOURCE_ID=$(aws apigateway create-resource \
-  --rest-api-id $API_ID \
-  --region $REGION \
-  --parent-id $ROOT_RESOURCE_ID \
-  --path-part "users" \
-  --query "id" --output text)
+# echo "Creating '/users' resource"
+# USERS_RESOURCE_ID=$(aws apigateway create-resource \
+#   --rest-api-id $API_ID \
+#   --region $REGION \
+#   --parent-id $ROOT_RESOURCE_ID \
+#   --path-part "users" \
+#   --query "id" --output text)
 
-# Create POST method for createUser
-echo "Creating POST method for '/users' to create a user (createUser Lambda)"
-aws apigateway put-method \
-  --rest-api-id $API_ID \
-  --region $REGION \
-  --resource-id $USERS_RESOURCE_ID \
-  --http-method POST \
-  --authorization-type NONE
+# # Create POST method for createUser
+# echo "Creating POST method for '/users' to create a user (createUser Lambda)"
+# aws apigateway put-method \
+#   --rest-api-id $API_ID \
+#   --region $REGION \
+#   --resource-id $USERS_RESOURCE_ID \
+#   --http-method POST \
+#   --authorization-type NONE
 
-# Add Method Response for 200 status code
-aws apigateway put-method-response \
-  --rest-api-id $API_ID \
-  --region $REGION \
-  --resource-id $USERS_RESOURCE_ID \
-  --http-method POST \
-  --status-code 200
+# # Add Method Response for 200 status code
+# aws apigateway put-method-response \
+#   --rest-api-id $API_ID \
+#   --region $REGION \
+#   --resource-id $USERS_RESOURCE_ID \
+#   --http-method POST \
+#   --status-code 200
 
-# Integrate POST method with createUser Lambda function (Non-Proxy) and set execution role
-aws apigateway put-integration \
-  --rest-api-id $API_ID \
-  --region $REGION \
-  --resource-id $USERS_RESOURCE_ID \
-  --http-method POST \
-  --integration-http-method POST \
-  --type AWS \
-  --uri arn:aws:apigateway:$REGION:lambda:path/2015-03-31/functions/arn:aws:lambda:$REGION:$ACCOUNT_ID:function:$LAMBDA_CREATE_USER/invocations \
-  --credentials $LAB_ROLE_ARN  # Specify the lab role ARN
+# # Integrate POST method with createUser Lambda function (Non-Proxy) and set execution role
+# aws apigateway put-integration \
+#   --rest-api-id $API_ID \
+#   --region $REGION \
+#   --resource-id $USERS_RESOURCE_ID \
+#   --http-method POST \
+#   --integration-http-method POST \
+#   --type AWS \
+#   --uri arn:aws:apigateway:$REGION:lambda:path/2015-03-31/functions/arn:aws:lambda:$REGION:$ACCOUNT_ID:function:$LAMBDA_CREATE_USER/invocations \
+#   --credentials $LAB_ROLE_ARN  # Specify the lab role ARN
 
-# Add Integration Response for 200 status code
-aws apigateway put-integration-response \
-  --rest-api-id $API_ID \
-  --region $REGION \
-  --resource-id $USERS_RESOURCE_ID \
-  --http-method POST \
-  --status-code 200 \
-  --selection-pattern ""
+# # Add Integration Response for 200 status code
+# aws apigateway put-integration-response \
+#   --rest-api-id $API_ID \
+#   --region $REGION \
+#   --resource-id $USERS_RESOURCE_ID \
+#   --http-method POST \
+#   --status-code 200 \
+#   --selection-pattern ""
 
-# Add resource-based permission for API Gateway to invoke the createUser Lambda function
-echo "Adding permission for API Gateway to invoke createUser Lambda"
-aws lambda add-permission \
-  --function-name $LAMBDA_CREATE_USER \
-  --principal apigateway.amazonaws.com \
-  --statement-id "api-gateway-access-createUser" \
-  --action "lambda:InvokeFunction" \
-  --source-arn arn:aws:execute-api:$REGION:$ACCOUNT_ID:$API_ID/*/POST/users
+# # Add resource-based permission for API Gateway to invoke the createUser Lambda function
+# echo "Adding permission for API Gateway to invoke createUser Lambda"
+# aws lambda add-permission \
+#   --function-name $LAMBDA_CREATE_USER \
+#   --principal apigateway.amazonaws.com \
+#   --statement-id "api-gateway-access-createUser" \
+#   --action "lambda:InvokeFunction" \
+#   --source-arn arn:aws:execute-api:$REGION:$ACCOUNT_ID:$API_ID/*/POST/users
 
-# Create GET method for getUser
-echo "Creating GET method for '/users' to get user (getUser Lambda)"
-aws apigateway put-method \
-  --rest-api-id $API_ID \
-  --region $REGION \
-  --resource-id $USERS_RESOURCE_ID \
-  --http-method GET \
-  --authorization-type NONE \
-  --request-parameters "method.request.path.user_name=true"
+# # Create GET method for getUser
+# echo "Creating GET method for '/users' to get user (getUser Lambda)"
+# aws apigateway put-method \
+#   --rest-api-id $API_ID \
+#   --region $REGION \
+#   --resource-id $USERS_RESOURCE_ID \
+#   --http-method GET \
+#   --authorization-type NONE \
+#   --request-parameters "method.request.path.user_name=true"
 
-# Add Method Response for 200 status code
-aws apigateway put-method-response \
-  --rest-api-id $API_ID \
-  --region $REGION \
-  --resource-id $USERS_RESOURCE_ID \
-  --http-method GET \
-  --status-code 200
+# # Add Method Response for 200 status code
+# aws apigateway put-method-response \
+#   --rest-api-id $API_ID \
+#   --region $REGION \
+#   --resource-id $USERS_RESOURCE_ID \
+#   --http-method GET \
+#   --status-code 200
 
-# Integrate GET method with getUser Lambda function (Non-Proxy) and set execution role
-aws apigateway put-integration \
-  --rest-api-id $API_ID \
-  --region $REGION \
-  --resource-id $USERS_RESOURCE_ID \
-  --http-method GET \
-  --integration-http-method GET \
-  --type AWS \
-  --uri arn:aws:apigateway:$REGION:lambda:path/2015-03-31/functions/arn:aws:lambda:$REGION:$ACCOUNT_ID:function:$LAMBDA_GET_USER/invocations \
-  --credentials $LAB_ROLE_ARN  # Specify the lab role ARN
+# # Integrate GET method with getUser Lambda function (Non-Proxy) and set execution role
+# aws apigateway put-integration \
+#   --rest-api-id $API_ID \
+#   --region $REGION \
+#   --resource-id $USERS_RESOURCE_ID \
+#   --http-method GET \
+#   --integration-http-method GET \
+#   --type AWS \
+#   --uri arn:aws:apigateway:$REGION:lambda:path/2015-03-31/functions/arn:aws:lambda:$REGION:$ACCOUNT_ID:function:$LAMBDA_GET_USER/invocations \
+#   --credentials $LAB_ROLE_ARN  # Specify the lab role ARN
 
-# Add Integration Response for 200 status code
-aws apigateway put-integration-response \
-  --rest-api-id $API_ID \
-  --region $REGION \
-  --resource-id $USERS_RESOURCE_ID \
-  --http-method GET \
-  --status-code 200 \
-  --selection-pattern ""
+# # Add Integration Response for 200 status code
+# aws apigateway put-integration-response \
+#   --rest-api-id $API_ID \
+#   --region $REGION \
+#   --resource-id $USERS_RESOURCE_ID \
+#   --http-method GET \
+#   --status-code 200 \
+#   --selection-pattern ""
 
-# Add resource-based permission for API Gateway to invoke the getUser Lambda function
-echo "Adding permission for API Gateway to invoke getUser Lambda"
-aws lambda add-permission \
-  --function-name $LAMBDA_GET_USER \
-  --principal apigateway.amazonaws.com \
-  --statement-id "api-gateway-access-getUser" \
-  --action "lambda:InvokeFunction" \
-  --source-arn arn:aws:execute-api:$REGION:$ACCOUNT_ID:$API_ID/*/GET/users
+# # Add resource-based permission for API Gateway to invoke the getUser Lambda function
+# echo "Adding permission for API Gateway to invoke getUser Lambda"
+# aws lambda add-permission \
+#   --function-name $LAMBDA_GET_USER \
+#   --principal apigateway.amazonaws.com \
+#   --statement-id "api-gateway-access-getUser" \
+#   --action "lambda:InvokeFunction" \
+#   --source-arn arn:aws:execute-api:$REGION:$ACCOUNT_ID:$API_ID/*/GET/users
 
 # Create '/products' resource for createProduct, getProduct, and getAllProducts
 echo "Creating '/products' resource"

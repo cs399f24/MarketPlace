@@ -1,5 +1,5 @@
 # Ignore all ZIP files
-*.zip
+.zip
 
 # Other files and directories to ignore
 node_modules/
