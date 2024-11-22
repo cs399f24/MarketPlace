@@ -5,11 +5,24 @@ from botocore.exceptions import NoCredentialsError, PartialCredentialsError
 
 class DynamoDBMarketPlace:
     def __init__(self):
+        """
+        Initializes the DynamoDBMarketPlace class and sets up the DynamoDB table resource.
+        """
         dynamodb = boto3.resource('dynamodb', region_name='us-east-1')
         self.table = dynamodb.Table('MarketPlaceDatabase')
     
-    # Create a new product in the database
     def create_product(self, product_name, product_price, product_owner):
+        """
+        Creates a new product in the DynamoDB table 'MarketPlaceDatabase'.
+
+        Args:
+            product_name (str): The name of the product.
+            product_price (float): The price of the product.
+            product_owner (str): The owner of the product.
+
+        Returns:
+            dict: The response from DynamoDB if the product is created successfully, None otherwise.
+        """
         product_id = str(uuid.uuid4())  # Generate a unique product ID
         try:
             response = self.table.put_item(
@@ -28,6 +41,16 @@ class DynamoDBMarketPlace:
             return None
 
 def lambda_handler(event, context):
+    """
+    AWS Lambda handler function to create a new product.
+
+    Args:
+        event (dict): The event data passed to the Lambda function.
+        context (object): The context object passed to the Lambda function.
+
+    Returns:
+        dict: A dictionary containing the status code, response body, and headers.
+    """
     # Extract product data from the event
     product_name = event.get('product_name')
     product_price = event.get('product_price')
@@ -48,10 +71,19 @@ def lambda_handler(event, context):
     if response is not None:
         return {
             'statusCode': 200,
-            'body': json.dumps({'message': 'Product created successfully'})
+            'body': json.dumps({'message': 'Product created successfully'}),
+            'headers': {
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*'
+            }
         }
     else:
         return {
             'statusCode': 500,
-            'body': json.dumps({'error': 'Failed to create product'})
+            'body': json.dumps({'error': 'Failed to create product'}),
+            'headers': {
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*'
+            }
         }
+    

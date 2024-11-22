@@ -5,11 +5,23 @@ from botocore.exceptions import NoCredentialsError, PartialCredentialsError
 
 class DynamoDBMarketPlace:
     def __init__(self):
+        """
+        Initializes the DynamoDBMarketPlace class and sets up the DynamoDB table resource.
+        """
         dynamodb = boto3.resource('dynamodb', region_name='us-east-1')
         self.table = dynamodb.Table('MarketPlaceDatabase')
     
-    # Create a new user in the database
     def create_user(self, user_name, email):
+        """
+        Creates a new user in the DynamoDB table 'MarketPlaceDatabase'.
+
+        Args:
+            user_name (str): The name of the user.
+            email (str): The email of the user.
+
+        Returns:
+            dict: The response from DynamoDB if the user is created successfully, None otherwise.
+        """
         user_id = str(uuid.uuid4())  # Generate a unique user ID
         try:
             response = self.table.put_item(
@@ -27,6 +39,16 @@ class DynamoDBMarketPlace:
             return None
 
 def lambda_handler(event, context):
+    """
+    AWS Lambda handler function to create a new user.
+
+    Args:
+        event (dict): The event data passed to the Lambda function.
+        context (object): The context object passed to the Lambda function.
+
+    Returns:
+        dict: A dictionary containing the status code, response body, and headers.
+    """
     # Extract user data from the event
     user_name = event.get('user_name')
     email = event.get('email')
@@ -46,10 +68,18 @@ def lambda_handler(event, context):
     if response is not None:
         return {
             'statusCode': 200,
-            'body': json.dumps({'message': 'User created successfully'})
+            'body': json.dumps({'message': 'User created successfully'}),
+            'headers': {
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*'
+            }
         }
     else:
         return {
             'statusCode': 500,
-            'body': json.dumps({'error': 'Failed to create user'})
+            'body': json.dumps({'error': 'Failed to create user'}),
+            'headers': {
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*'
+            }
         }

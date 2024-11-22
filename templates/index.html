@@ -5,9 +5,15 @@
     <title>Marketplace</title>
     <link rel="stylesheet" href="style.css">
     <script>
+        // Set the server and login server URLs
         const server = 'https://c2zk70xvb0.execute-api.us-east-1.amazonaws.com/prod'; // Replace <API-GATEWAY-ENDPOINT> with your API Gateway endpoint
         const login_server = 'https://marketplaceapp.auth.us-east-1.amazoncognito.com/login?client_id=103prmccppgm9p7p2mgdgk37ot&response_type=token&scope=email+openid&redirect_uri=https%3A%2F%2Fstaging.d1rbyo11f08fn5.amplifyapp.com%2Fcallback.html';
 
+        /**
+         * Handles user authentication.
+         * If the user is logged in, logs them out and updates the auth button.
+         * If the user is not logged in, redirects them to the login page.
+         */
         function handleAuth() {
             if (localStorage.getItem('bearer_str')) {
                 // Redirect to sign out page if logged in
@@ -21,6 +27,9 @@
             }
         }
 
+        /**
+         * Updates the text of the authentication button based on the user's login status.
+         */
         function updateAuthButton() {
             const authButton = document.getElementById('authButton');
             if (localStorage.getItem('bearer_str')) {
@@ -30,6 +39,11 @@
             }
         }
 
+        /**
+         * Fetches product data from the server.
+         * If the user is not logged in, alerts them and returns.
+         * If the user is logged in, fetches the product data and displays it in a list.
+         */
         async function fetchProductData() {
             const bearerToken = localStorage.getItem('bearer_str');
             if (!bearerToken) {
@@ -67,6 +81,9 @@
             }
         }
 
+        /**
+         * Initializes the page by updating the auth button and fetching product data.
+         */
         window.onload = function() {
             updateAuthButton();
             fetchProductData();
@@ -82,4 +99,3 @@
     </div>
 </body>
 </html>
-

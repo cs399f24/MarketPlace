@@ -4,6 +4,15 @@ from botocore.exceptions import NoCredentialsError, PartialCredentialsError
 from boto3.dynamodb.conditions import Attr
 
 def get_user(user_name):
+    """
+    Retrieves a user from the DynamoDB table 'MarketPlaceDatabase' based on the username.
+
+    Args:
+        user_name (str): The username of the user to retrieve.
+
+    Returns:
+        dict: A dictionary containing the user details if found, None otherwise.
+    """
     dynamodb = boto3.resource('dynamodb', region_name='us-east-1')
     table = dynamodb.Table('MarketPlaceDatabase')
     
@@ -21,6 +30,16 @@ def get_user(user_name):
         return None
 
 def lambda_handler(event, context):
+    """
+    AWS Lambda handler function to retrieve a user based on the username.
+
+    Args:
+        event (dict): The event data passed to the Lambda function.
+        context (object): The context object passed to the Lambda function.
+
+    Returns:
+        dict: A dictionary containing the status code, response body, and headers.
+    """
     # Extract user_name from the event
     user_name = event.get('user_name')
 
@@ -30,7 +49,7 @@ def lambda_handler(event, context):
             'body': json.dumps({'error': 'Missing user_name'})
         }
 
-    # Call the get_user_by_username function
+    # Call the get_user function
     user = get_user(user_name)
 
     if user is not None:
@@ -45,5 +64,10 @@ def lambda_handler(event, context):
     else:
         return {
             'statusCode': 500,
-            'body': json.dumps({'error': 'Failed to retrieve user'})
+            'body': json.dumps({'error': 'Failed to retrieve user'}),
+            'headers': {
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*'
+            }
         }
+    
