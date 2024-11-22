@@ -5,56 +5,54 @@
     <title>Marketplace</title>
     <link rel="stylesheet" href="style.css">
     <script>
-        const server = '<API-GATEWAY-ENDPOINT>'; // Replace <API-GATEWAY-ENDPOINT> with your API Gateway endpoint
+        const server = 'https://c2zk70xvb0.execute-api.us-east-1.amazonaws.com/prod'; // Replace <API-GATEWAY-ENDPOINT> with your API Gateway endpoint
+        const login_server = 'https://marketplaceapp.auth.us-east-1.amazoncognito.com/login?client_id=103prmccppgm9p7p2mgdgk37ot&response_type=token&scope=email+openid&redirect_uri=https%3A%2F%2Fstaging.d1rbyo11f08fn5.amplifyapp.com%2Fcallback.html';
 
-        // async function fetchUserData() {
-        //     try {
-        //         const response = await fetch(`${server}/get_all_users`);
-        //         if (!response.ok) {
-        //             throw new Error(`HTTP error! Status: ${response.status}`);
-        //         }
-        //         const data = await response.json();
-        //         console.log(data); // Inspect the data structure
+        function handleAuth() {
+            if (localStorage.getItem('bearer_str')) {
+                // Redirect to sign out page if logged in
+                localStorage.removeItem('bearer_str');
+                updateAuthButton();
+                alert('Logged out successfully');
+                window.location.reload();
+            } else {
+                // Redirect to login page if not logged in
+                window.location.href = login_server;
+            }
+        }
 
-        //         const listElement = document.getElementById('user-list'); // Make sure this ID matches your HTML
-        //         listElement.innerHTML = ''; // Clear existing content
-
-        //         // Iterate over the array of users and create list items for each
-        //         data.forEach(user => {
-        //             const listItem = document.createElement('li');
-        //             listItem.textContent = `User: ${user.UserName}, Email: ${user.Email}`;
-        //             listElement.appendChild(listItem);
-        //         });
-
-        //     } catch (error) {
-        //         console.error('Error fetching user data:', error);
-        //     }
-        // }
+        function updateAuthButton() {
+            const authButton = document.getElementById('authButton');
+            if (localStorage.getItem('bearer_str')) {
+                authButton.innerText = "Logout";
+            } else {
+                authButton.innerText = "Login";
+            }
+        }
 
         async function fetchProductData() {
+            const bearerToken = localStorage.getItem('bearer_str');
+            if (!bearerToken) {
+                alert('You must be logged in to view products.');
+                return;
+            }
+
             try {
-                const response = await fetch(`${server}/products/get_all_products`);
+                const response = await fetch(`${server}/products/get_all_products`, {
+                    headers: {
+                        'Authorization': `Bearer ${bearerToken}`
+                    }
+                });
                 if (!response.ok) {
                     throw new Error(`HTTP error! Status: ${response.status}`);
                 }
-                const responseData = await response.json(); // Get the response as a JSON object
-                console.log('Response data:', responseData); // Log the response data
+                const responseData = await response.json();
+                const data = JSON.parse(responseData.body);
 
-                let data;
-                try {
-                    data = JSON.parse(responseData.body); // Parse the JSON string in the body into a JavaScript object
-                    console.log('Parsed data:', data); // Log the parsed data
-                } catch (parseError) {
-                    console.error('Error parsing JSON:', parseError);
-                    return;
-                }
-
-                const listElement = document.getElementById('product-list'); // Make sure this ID matches your HTML
+                const listElement = document.getElementById('product-list');
                 listElement.innerHTML = ''; // Clear existing content
 
-                // Check if data is an array
                 if (Array.isArray(data)) {
-                    // Iterate over the array of products and create list items for each
                     for (let i = 0; i < data.length; i++) {
                         const product = data[i];
                         const listItem = document.createElement('li');
@@ -64,27 +62,24 @@
                 } else {
                     console.error('Data is not an array:', data);
                 }
-
             } catch (error) {
                 console.error('Error fetching product data:', error);
             }
         }
 
         window.onload = function() {
-            // fetchUserData();
+            updateAuthButton();
             fetchProductData();
         };
     </script>
 </head>
 <body>
-    <h1>Welcome to the marketplace!</h1>
-    <div id="user">
-        <h2>Users</h2>
-        <ul id="user-list"></ul>
-    </div>
+    <button id="authButton" onclick="handleAuth()">Login</button>
+    <h1>Welcome to the Marketplace!</h1>
     <div id="product">
         <h2>Products</h2>
-        <ul id="product-list"></ul>
+        <ul id="product-list">Loading...</ul>
     </div>
 </body>
 </html>
+

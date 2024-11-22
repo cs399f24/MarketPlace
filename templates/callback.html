@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Post Login Redirect</title>
+</head>
+<body>
+    <section>
+        <p>Redirecting...</p>
+    </section>
+    <script>
+        (function init() {
+            // Check if URL contains tokens
+            if (!location.hash) {
+                alert("Authentication failed. No tokens found in the URL.");
+                return;
+            }
+
+            // Ensure localStorage is available
+            if (!window.localStorage) {
+                alert("LocalStorage is not enabled. Please check your browser settings.");
+                return;
+            }
+
+            // Parse the tokens from the URL hash
+            const hashParams = new URLSearchParams(location.hash.substring(1));
+            const idToken = hashParams.get("id_token");
+            const accessToken = hashParams.get("access_token");
+
+            if (!idToken && !accessToken) {
+                alert("No tokens found. Ensure the login process is configured correctly.");
+                return;
+            }
+
+            // Store tokens in localStorage
+            if (idToken) {
+                window.localStorage.setItem("id_token", idToken);
+            }
+            if (accessToken) {
+                window.localStorage.setItem("access_token", accessToken);
+            }
+
+            // Redirect to the main page (index.html)
+            window.location = location.origin + "/index.html";
+        })();
+    </script>
+</body>
+</html>
+

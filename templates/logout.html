@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logging Out...</title>
+    <script>
+        const cognitoDomain = "https://marketplaceapp.auth.us-east-1.amazoncognito.com"; // Replace with your Cognito domain
+        const clientId = "103prmccppgm9p7p2mgdgk37ot"; // Replace with your App Client ID
+        const redirectUri = "https://staging.d1rbyo11f08fn5.amplifyapp.com/logout.html"; // Replace with your redirect URL (e.g., homepage)
+
+        function logout() {
+            // Clear tokens from localStorage
+            localStorage.removeItem('bearer_str');
+            localStorage.removeItem('id_token');
+
+            // Redirect to Cognito's logout endpoint
+            const logoutUrl = `${cognitoDomain}/logout?client_id=${clientId}&logout_uri=${encodeURIComponent(redirectUri)}`;
+            window.location.href = logoutUrl;
+        }
+
+        window.onload = logout;
+    </script>
+</head>
+<body>
+    <h1>Logging Out...</h1>
+</body>
+</html>
