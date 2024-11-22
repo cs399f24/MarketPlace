@@ -17,6 +17,12 @@ ACCOUNT_ID=$(aws sts get-caller-identity --query "Account" --output text)
 # Define the lab role ARN (replace with the actual ARN of your "lab role")
 LAB_ROLE_ARN="arn:aws:iam::${ACCOUNT_ID}:role/lab-role"
 
+# Get Cognito User Pool ARN
+COGNITO_USER_POOL_ARN=$(aws cognito-idp describe-user-pool \
+  --user-pool-id marketplace-userpool \
+  --region $REGION \
+  --query "UserPool.Arn" --output text)
+
 # Create the API Gateway
 echo "Creating API Gateway: $API_NAME"
 API_ID=$(aws apigateway create-rest-api \
@@ -134,6 +140,18 @@ ROOT_RESOURCE_ID=$(aws apigateway get-resources \
 #   --action "lambda:InvokeFunction" \
 #   --source-arn arn:aws:execute-api:$REGION:$ACCOUNT_ID:$API_ID/*/GET/users
 
+# Create a Cognito Authorizer
+echo "Creating Cognito Authorizer: CognitoAuth"
+AUTHORIZER_ID=$(aws apigateway create-authorizer \
+  --rest-api-id $API_ID \
+  --name "CognitoAuth" \
+  --type COGNITO_USER_POOLS \
+  --provider-arns $COGNITO_USER_POOL_ARN \
+  --identity-source "method.request.header.Authorization" \
+  --query "id" --output text)
+
+echo "Cognito Authorizer created with ID: $AUTHORIZER_ID"
+
 # Create '/products' resource for createProduct, getProduct, and getAllProducts
 echo "Creating '/products' resource"
 PRODUCTS_RESOURCE_ID=$(aws apigateway create-resource \
@@ -149,8 +167,8 @@ aws apigateway put-method \
   --rest-api-id $API_ID \
   --region $REGION \
   --resource-id $PRODUCTS_RESOURCE_ID \
-  --http-method POST \
-  --authorization-type NONE
+  --authorization-type COGNITO_USER_POOLS \
+  --authorizer-id $AUTHORIZER_ID
 
 # Add Method Response for 200 status code
 aws apigateway put-method-response \
@@ -196,8 +214,8 @@ aws apigateway put-method \
   --region $REGION \
   --resource-id $PRODUCTS_RESOURCE_ID \
   --http-method GET \
-  --authorization-type NONE \
-  --request-parameters "method.request.path.product_id=true"
+  --authorization-type COGNITO_USER_POOLS \
+  --authorizer-id $AUTHORIZER_ID
 
 # Add Method Response for 200 status code
 aws apigateway put-method-response \
@@ -252,7 +270,8 @@ aws apigateway put-method \
   --region $REGION \
   --resource-id $GET_ALL_PRODUCTS_RESOURCE_ID \
   --http-method GET \
-  --authorization-type NONE
+  --authorization-type COGNITO_USER_POOLS \
+  --authorizer-id $AUTHORIZER_ID
 
 # Add Method Response for 200 status code
 aws apigateway put-method-response \
