@@ -7,7 +7,7 @@ DOMAIN_PREFIX="marketplace-domain"  # Change this to your desired domain prefix
 REGION="us-east-1"  # Modify if necessary
 
 # Retrieve the Amplify App ID automatically (assuming the app name is known)
-AMPLIFY_APP_NAME="marketplace-app"  # Replace with your actual Amplify app name
+AMPLIFY_APP_NAME="marketplaceapp"  # Replace with your actual Amplify app name
 AMPLIFY_APP_ID=$(aws amplify list-apps --query "apps[?name=='$AMPLIFY_APP_NAME'].appId" --output text)
 
 # Check if the App ID was found
