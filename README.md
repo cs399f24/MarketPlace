@@ -44,20 +44,22 @@ An online web application that allows users to interact with each other in a vir
 
 * Git clone the repo in the AWS CLI: `https://github.com/cs399f24/MarketPlace.git`
 
-* Create DynamoDB Table and Lambda Functions
-     * Go to the MarketPlace Directory using `cd MarketPlace/`
-     * Grant permissions to deploy_scripts.sh: `chmod +x deploy_scripts.sh`
-     * Run the script: `./deploy_scripts.sh`
+* Create Dynamo Table(Only if needed)
+     * Go to the dynamodb Directory using `cd MarketPlace/dynamodb`
+     * Grant permissions to create_dynamodb_table.sh: `chmod +x create_dynamodb_table.sh`
+     * Run the script: `./create_dynamodb_table.sh`
 
-* Create API 
-     * Grant permissions to create_marketplace_api.sh: `chmod +x create_marketplace_api.sh`
-     * Run the script: `./create_marketplace_api.sh`
+* Create Lambda Functions
+     * Make sure you are in the `MarketPlace` directory
+     * Grant permissions to deploy_lambda_scripts.sh: `chmod +x deploy_lambda_scripts.sh`
+     * Run the script: `./deploy_lambda_scripts.sh`
 
-* Create S3 Bucket
-     * Navigate to template folder with `cd templates/`
-     * In the `create_bucket.sh` script, replace the <bucket-name> field with a unique bucket name
-     * Grant permissions: `chmod +x create_bucket.sh`
-     * Run the script: `./create_bucket.sh`
+* Make sure you have an s3 bucket in which you would like to place necessary files
+     * Create s3 bucket if needed
+          * Navigate to s3_bucket folder
+          * In the `create_bucket.sh` script, replace the <bucket-name> field with a unique bucket name
+          * Grant permissions: `chmod +x create_bucket.sh`
+          * Run the script: `./create_bucket.sh`
 
 * Create Amplify Instance: 
      * Navigate to the Amplify console, and select 'Deploy App'
@@ -67,8 +69,12 @@ An online web application that allows users to interact with each other in a vir
      * Hit 'Save and Deploy'
 
 * Create Cognito User Pool
-      * Grant permissions: `chmod +x create_cognito_user_pool.sh`
+     * Grant permissions: `chmod +x create_cognito_user_pool.sh`
      * Run the script: `./create_cognito_user_pool.sh`
+
+* Create API 
+     * Grant permissions to create_marketplace_api.sh: `chmod +x create_marketplace_api.sh`
+     * Run the script: `./create_marketplace_api.sh`
 
 * Modify index.html
      * Replace 'const server' field with your API invoke url
@@ -85,7 +91,7 @@ An online web application that allows users to interact with each other in a vir
 
 * Create user in cognito user pool to test login functionality
 
-* Copy the html and css files to the S3 Bucket with the following AWS CLI Commands: 
+* Copy the html and css files to the S3 Bucket with the following AWS CLI Commands(nagivate to `frontend` folder):
      * `aws s3 cp index.html s3://<your_bucket_name>`
      * `aws s3 cp logout.html s3://<your_bucket_name>`
      * `aws s3 cp callback.html s3://<your_bucket_name>`
