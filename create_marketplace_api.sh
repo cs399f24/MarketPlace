@@ -14,6 +14,9 @@ REGION="us-east-1"
 # Get the AWS account ID
 ACCOUNT_ID=$(aws sts get-caller-identity --query "Account" --output text)
 
+# Define the lab role ARN (replace with the actual ARN of your "lab role")
+LAB_ROLE_ARN="arn:aws:iam::${ACCOUNT_ID}:role/lab-role"
+
 # Create the API Gateway
 echo "Creating API Gateway: $API_NAME"
 API_ID=$(aws apigateway create-rest-api \
@@ -55,7 +58,7 @@ aws apigateway put-method-response \
   --http-method POST \
   --status-code 200
 
-# Integrate POST method with createUser Lambda function (Non-Proxy)
+# Integrate POST method with createUser Lambda function (Non-Proxy) and set execution role
 aws apigateway put-integration \
   --rest-api-id $API_ID \
   --region $REGION \
@@ -63,7 +66,8 @@ aws apigateway put-integration \
   --http-method POST \
   --integration-http-method POST \
   --type AWS \
-  --uri arn:aws:apigateway:$REGION:lambda:path/2015-03-31/functions/arn:aws:lambda:$REGION:$ACCOUNT_ID:function:$LAMBDA_CREATE_USER/invocations
+  --uri arn:aws:apigateway:$REGION:lambda:path/2015-03-31/functions/arn:aws:lambda:$REGION:$ACCOUNT_ID:function:$LAMBDA_CREATE_USER/invocations \
+  --credentials $LAB_ROLE_ARN  # Specify the lab role ARN
 
 # Add Integration Response for 200 status code
 aws apigateway put-integration-response \
@@ -84,7 +88,7 @@ aws lambda add-permission \
   --source-arn arn:aws:execute-api:$REGION:$ACCOUNT_ID:$API_ID/*/POST/users
 
 # Create GET method for getUser
-echo "Creating GET method for '/users/{user_name}' to get user (getUser Lambda)"
+echo "Creating GET method for '/users' to get user (getUser Lambda)"
 aws apigateway put-method \
   --rest-api-id $API_ID \
   --region $REGION \
@@ -101,7 +105,7 @@ aws apigateway put-method-response \
   --http-method GET \
   --status-code 200
 
-# Integrate GET method with getUser Lambda function (Non-Proxy)
+# Integrate GET method with getUser Lambda function (Non-Proxy) and set execution role
 aws apigateway put-integration \
   --rest-api-id $API_ID \
   --region $REGION \
@@ -109,7 +113,8 @@ aws apigateway put-integration \
   --http-method GET \
   --integration-http-method GET \
   --type AWS \
-  --uri arn:aws:apigateway:$REGION:lambda:path/2015-03-31/functions/arn:aws:lambda:$REGION:$ACCOUNT_ID:function:$LAMBDA_GET_USER/invocations
+  --uri arn:aws:apigateway:$REGION:lambda:path/2015-03-31/functions/arn:aws:lambda:$REGION:$ACCOUNT_ID:function:$LAMBDA_GET_USER/invocations \
+  --credentials $LAB_ROLE_ARN  # Specify the lab role ARN
 
 # Add Integration Response for 200 status code
 aws apigateway put-integration-response \
@@ -155,7 +160,7 @@ aws apigateway put-method-response \
   --http-method POST \
   --status-code 200
 
-# Integrate POST method with createProduct Lambda function (Non-Proxy)
+# Integrate POST method with createProduct Lambda function (Non-Proxy) and set execution role
 aws apigateway put-integration \
   --rest-api-id $API_ID \
   --region $REGION \
@@ -163,7 +168,8 @@ aws apigateway put-integration \
   --http-method POST \
   --integration-http-method POST \
   --type AWS \
-  --uri arn:aws:apigateway:$REGION:lambda:path/2015-03-31/functions/arn:aws:lambda:$REGION:$ACCOUNT_ID:function:$LAMBDA_CREATE_PRODUCT/invocations
+  --uri arn:aws:apigateway:$REGION:lambda:path/2015-03-31/functions/arn:aws:lambda:$REGION:$ACCOUNT_ID:function:$LAMBDA_CREATE_PRODUCT/invocations \
+  --credentials $LAB_ROLE_ARN  # Specify the lab role ARN
 
 # Add Integration Response for 200 status code
 aws apigateway put-integration-response \
@@ -184,7 +190,7 @@ aws lambda add-permission \
   --source-arn arn:aws:execute-api:$REGION:$ACCOUNT_ID:$API_ID/*/POST/products
 
 # Create GET method for getProduct
-echo "Creating GET method for '/products/{product_id}' to get a product (getProduct Lambda)"
+echo "Creating GET method for '/products' to get a product (getProduct Lambda)"
 aws apigateway put-method \
   --rest-api-id $API_ID \
   --region $REGION \
@@ -201,7 +207,7 @@ aws apigateway put-method-response \
   --http-method GET \
   --status-code 200
 
-# Integrate GET method with getProduct Lambda function (Non-Proxy)
+# Integrate GET method with getProduct Lambda function (Non-Proxy) and set execution role
 aws apigateway put-integration \
   --rest-api-id $API_ID \
   --region $REGION \
@@ -209,7 +215,8 @@ aws apigateway put-integration \
   --http-method GET \
   --integration-http-method GET \
   --type AWS \
-  --uri arn:aws:apigateway:$REGION:lambda:path/2015-03-31/functions/arn:aws:lambda:$REGION:$ACCOUNT_ID:function:$LAMBDA_GET_PRODUCT/invocations
+  --uri arn:aws:apigateway:$REGION:lambda:path/2015-03-31/functions/arn:aws:lambda:$REGION:$ACCOUNT_ID:function:$LAMBDA_GET_PRODUCT/invocations \
+  --credentials $LAB_ROLE_ARN  # Specify the lab role ARN
 
 # Add Integration Response for 200 status code
 aws apigateway put-integration-response \
@@ -255,7 +262,7 @@ aws apigateway put-method-response \
   --http-method GET \
   --status-code 200
 
-# Integrate GET method with getAllProducts Lambda function (Non-Proxy)
+# Integrate GET method with getAllProducts Lambda function (Non-Proxy) and set execution role
 aws apigateway put-integration \
   --rest-api-id $API_ID \
   --region $REGION \
@@ -263,7 +270,8 @@ aws apigateway put-integration \
   --http-method GET \
   --integration-http-method GET \
   --type AWS \
-  --uri arn:aws:apigateway:$REGION:lambda:path/2015-03-31/functions/arn:aws:lambda:$REGION:$ACCOUNT_ID:function:$LAMBDA_GET_ALL_PRODUCTS/invocations
+  --uri arn:aws:apigateway:$REGION:lambda:path/2015-03-31/functions/arn:aws:lambda:$REGION:$ACCOUNT_ID:function:$LAMBDA_GET_ALL_PRODUCTS/invocations \
+  --credentials $LAB_ROLE_ARN  # Specify the lab role ARN
 
 # Add Integration Response for 200 status code
 aws apigateway put-integration-response \
