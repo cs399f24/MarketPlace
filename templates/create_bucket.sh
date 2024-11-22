@@ -6,7 +6,12 @@ REGION="us-east-1"
 
 # Create the S3 bucket
 echo "Creating S3 bucket: $BUCKET_NAME"
-aws s3api create-bucket --bucket $BUCKET_NAME --region $REGION 
+aws s3api create-bucket --bucket $BUCKET_NAME --region $REGION --create-bucket-configuration LocationConstraint=$REGION
+
+# Ensure that "Block all public access" is disabled
+echo "Disabling 'Block all public access' for the bucket"
+aws s3api put-bucket-public-access-block --bucket $BUCKET_NAME --public-access-block-configuration \
+    "BlockPublicAcls=false,IgnorePublicAcls=false,BlockPublicPolicy=false,RestrictPublicBuckets=false"
 
 # Enable static website hosting on the bucket
 echo "Enabling static website hosting on the bucket"
