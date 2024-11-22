@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define S3 bucket name and region
-BUCKET_NAME="<bucket-name>"  # Unique bucket name of your choice
+BUCKET_NAME="marketplace399-fuentes"  # Unique bucket name of your choice
 REGION="us-east-1"
 
 # Create the S3 bucket

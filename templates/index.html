@@ -5,9 +5,11 @@
     <title>Marketplace</title>
     <link rel="stylesheet" href="style.css">
     <script>
-        const server = 'https://hdrq77dp7h.execute-api.us-east-1.amazonaws.com/prod';
+        const server = 'https://hdrq77dp7h.execute-api.us-east-1.amazonaws.com/prod'; // replace with your API Gateway endpoint
+        
+        // replace with your login server URL
         const login_server = 'https://ss-2024-11-21.auth.us-east-1.amazoncognito.com/login?client_id=51h77vn3rse7n58bum9c8dd4bu&response_type=token&scope=email+openid&redirect_uri=https%3A%2F%2Fstaging.d3c6e5p4ore4dg.amplifyapp.com%2Fcallback.html';
-
+        
         function handleAuth() {
             if (localStorage.getItem('bearer_str')) {
                 localStorage.removeItem('bearer_str');
