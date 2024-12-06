@@ -33,14 +33,19 @@
         async function fetchProductData() {
             const bearerToken = localStorage.getItem('bearer_str');
             if (!bearerToken) {
-                document.getElementById('product-list').innerHTML = '<li>Please log in to view products.</li>';
+                alert('You must be logged in to view products.');
                 return;
             }
+
             try {
                 const response = await fetch(`${server}/products/get_all_products`, {
-                    headers: { 'Authorization': `Bearer ${bearerToken}` }
+                    headers: {
+                        'Authorization': `Bearer ${bearerToken}`
+                    }
                 });
-                if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
                 const responseData = await response.json();
                 const data = JSON.parse(responseData.body);
 
@@ -51,15 +56,13 @@
                     data.forEach(product => {
                         const listItem = document.createElement('li');
                         listItem.innerHTML = `
-                            <strong>${product.ProductName}</strong><br>
-                            Price: $${product.ProductPrice}<br>
-                            Owner: ${product.ProductOwner}
-                            <button class="auth-button" onclick="deleteProduct('${product.ProductName}', '${product.ProductPrice}', '${product.ProductOwner}')">Delete</button>
-                        `;
+                            Product: ${product.ProductName}, Price: ${product.ProductPrice}, Owner: ${product.ProductOwner} 
+                            <button onclick="deleteProduct('${product.ProductName}', '${product.ProductPrice}', '${product.ProductOwner}')">Delete</button>
+                            <button onclick="buyProduct('${product.ProductName}', '${product.ProductPrice}')">Buy</button>`;
                         listElement.appendChild(listItem);
                     });
                 } else {
-                    listElement.innerHTML = '<li>No products available.</li>';
+                    console.error('Data is not an array:', data);
                 }
             } catch (error) {
                 console.error('Error fetching product data:', error);
@@ -153,6 +156,66 @@
                 fetchProductData();
             } catch (error) {
                 console.error('Error deleting product:', error);
+            }
+        }
+
+        async function buyProduct(productName, productPrice) {
+            const bearerToken = localStorage.getItem('bearer_str');
+            if (!bearerToken) {
+                alert('You must be logged in to buy products.');
+                return;
+            }
+
+            // Confirm purchase
+            const isConfirmed = confirm(`Are you sure you want to purchase "${productName}" for $${productPrice}? EW CRINGE!`);
+            if (!isConfirmed) {
+                return;
+            }
+
+            try {
+                // Decode JWT to extract the user's email
+                const base64Url = bearerToken.split('.')[1]; // Extract payload from JWT
+                const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/'); // URL-safe to Base64
+                const payload = JSON.parse(atob(base64)); // Decode the Base64 string
+
+                // Log the decoded payload to ensure the email exists
+                console.log('Decoded Payload:', payload);
+
+                const userEmail = payload['email']; // Get the email from the token payload
+
+                if (!userEmail) {
+                    console.error('Email not found in token payload.');
+                    alert('Failed to retrieve email from token. Ensure you are logged in.');
+                    return;
+                }
+
+                // Prepare request body
+                const requestBody = {
+                    product_name: productName,
+                    product_price: productPrice,
+                    user_email: userEmail
+                };
+
+                console.log('Request Body:', requestBody); // Log the request body
+
+                // Make API call to initiate the purchase
+                const response = await fetch(`${server}/products/purchase`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${bearerToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(requestBody)
+                });
+    
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+
+                alert(`Purchase confirmed! A receipt has been sent to ${userEmail}.`);
+            } catch (error) {
+                console.error('Error processing purchase:', error);
+                alert('Failed to complete the purchase. Please try again.');
             }
         }
 
