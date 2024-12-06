@@ -7,6 +7,7 @@ LAMBDA_GET_USER="getUser"
 LAMBDA_CREATE_PRODUCT="createProduct"
 LAMBDA_GET_PRODUCT="getProduct"
 LAMBDA_GET_ALL_PRODUCTS="getAllProducts"
+LAMBDA_DELETE_PRODUCT="deleteProduct"
 
 # Set the region
 REGION="us-east-1"
@@ -15,7 +16,7 @@ REGION="us-east-1"
 ACCOUNT_ID=$(aws sts get-caller-identity --query "Account" --output text)
 
 # Define the lab role ARN (replace with the actual ARN of your "lab role")
-LAB_ROLE_ARN="arn:aws:iam::${ACCOUNT_ID}:role/lab-role"
+LAB_ROLE_ARN="arn:aws:iam::${ACCOUNT_ID}:role/LabRole"
 
 # Get Cognito User Pool ARN
 COGNITO_USER_POOL_ARN=$(aws cognito-idp describe-user-pool \
@@ -309,6 +310,53 @@ aws lambda add-permission \
   --statement-id "api-gateway-access-getAllProducts" \
   --action "lambda:InvokeFunction" \
   --source-arn arn:aws:execute-api:$REGION:$ACCOUNT_ID:$API_ID/*/GET/products/get_all_products
+
+# Create DELETE method for '/products' to delete a product (deleteProduct Lambda)
+echo "Creating DELETE method for '/products' to delete a product (deleteProduct Lambda)"
+aws apigateway put-method \
+  --rest-api-id $API_ID \
+  --region $REGION \
+  --resource-id $PRODUCTS_RESOURCE_ID \
+  --http-method DELETE \
+  --authorization-type COGNITO_USER_POOLS \
+  --authorizer-id $AUTHORIZER_ID
+
+# Add Method Response for 200 status code
+aws apigateway put-method-response \
+  --rest-api-id $API_ID \
+  --region $REGION \
+  --resource-id $PRODUCTS_RESOURCE_ID \
+  --http-method DELETE \
+  --status-code 200
+
+# Integrate DELETE method with deleteProduct Lambda function (Non-Proxy) and set execution role
+aws apigateway put-integration \
+  --rest-api-id $API_ID \
+  --region $REGION \
+  --resource-id $PRODUCTS_RESOURCE_ID \
+  --http-method DELETE \
+  --integration-http-method DELETE \
+  --type AWS \
+  --uri arn:aws:apigateway:$REGION:lambda:path/2015-03-31/functions/arn:aws:lambda:$REGION:$ACCOUNT_ID:function:$LAMBDA_DELETE_PRODUCT/invocations \
+  --credentials $LAB_ROLE_ARN  # Specify the lab role ARN
+
+# Add Integration Response for 200 status code
+aws apigateway put-integration-response \
+  --rest-api-id $API_ID \
+  --region $REGION \
+  --resource-id $PRODUCTS_RESOURCE_ID \
+  --http-method DELETE \
+  --status-code 200 \
+  --selection-pattern ""
+
+# Add resource-based permission for API Gateway to invoke the deleteProduct Lambda function
+echo "Adding permission for API Gateway to invoke deleteProduct Lambda"
+aws lambda add-permission \
+  --function-name $LAMBDA_DELETE_PRODUCT \
+  --principal apigateway.amazonaws.com \
+  --statement-id "api-gateway-access-deleteProduct" \
+  --action "lambda:InvokeFunction" \
+  --source-arn arn:aws:execute-api:$REGION:$ACCOUNT_ID:$API_ID/*/DELETE/products
 
 # Deploy the API to a new stage
 echo "Deploying API Gateway"
