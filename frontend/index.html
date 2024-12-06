@@ -58,7 +58,7 @@
                         listItem.innerHTML = `
                             Product: ${product.ProductName}, Price: ${product.ProductPrice}, Owner: ${product.ProductOwner} 
                             <button onclick="deleteProduct('${product.ProductName}', '${product.ProductPrice}', '${product.ProductOwner}')">Delete</button>
-                            <button onclick="buyProduct('${product.ProductName}', '${product.ProductPrice}')">Buy</button>`;
+                            <button onclick="buyProduct('${product.ProductName}', '${product.ProductPrice}', '${product.ProductOwner}')">Buy</button>`;
                         listElement.appendChild(listItem);
                     });
                 } else {
@@ -71,31 +71,72 @@
 
         async function addProduct() {
             const bearerToken = localStorage.getItem('bearer_str');
-            if (!bearerToken) return alert('You must be logged in to add a product.');
+            if (!bearerToken) {
+                alert('You must be logged in to add a product.');
+                return;
+            }
+
             const productName = document.getElementById('product-name').value.trim();
             const productPrice = document.getElementById('product-price').value.trim();
-            if (!productName || !productPrice) return alert('Please fill in both fields.');
+
+            if (!productName || !productPrice) {
+                alert('Please provide both product name and price.');
+                return;
+            }
 
             try {
-                const base64Url = bearerToken.split('.')[1];
-                const payload = JSON.parse(atob(base64Url));
-                const username = payload['username'] || payload['cognito:username'];
+                // Decode JWT to extract the username
+                const base64Url = bearerToken.split('.')[1]; // Extract payload from JWT
+                const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/'); // URL-safe to Base64
+                const payload = JSON.parse(atob(base64)); // Decode the Base64 string
+                console.log('Decoded Payload:', payload); // Debugging step
 
-                await fetch(`${server}/products`, {
+                const username = payload['username'] || payload['cognito:username']; // Adjust key as needed
+                if (!username) {
+                    alert('Failed to retrieve username from token. Ensure you are logged in.');
+                    return;
+                }
+
+                // Log username for debugging
+                console.log('Username:', username);
+
+                // Make API call to add the product
+                const requestBody = {
+                    product_name: productName,   // Correct key format
+                    product_price: productPrice, // Correct key format
+                    product_owner: username      // Correct key format
+                };
+
+                // Log request body for debugging
+                console.log('Request Body:', requestBody);
+
+                const response = await fetch(`${server}/products`, {
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${bearerToken}`,
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ product_name: productName, product_price: productPrice, product_owner: username })
+                    body: JSON.stringify(requestBody)
                 });
 
+                const responseData = await response.json();
+                console.log('Add Product Response:', responseData); // Debugging step
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+
                 alert('Product added successfully!');
+
+                // Clear input fields
                 document.getElementById('product-name').value = '';
                 document.getElementById('product-price').value = '';
+    
+                // Refresh product list
                 fetchProductData();
             } catch (error) {
                 console.error('Error adding product:', error);
+                alert('Failed to add product. Please try again.');
             }
         }
 
@@ -109,7 +150,7 @@
             try {
                 // Decode the JWT token to get the current user
                 const base64Url = bearerToken.split('.')[1];
-                const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
                 const payload = JSON.parse(atob(base64));
 
                 const currentUser = payload['username'] || payload['cognito:username'];
@@ -119,34 +160,33 @@
                     return;
                 }
 
-                // Check if the logged-in user is the owner of the product
+            // Check if the logged-in user is the owner of the product
                 if (productOwner !== currentUser) {
                     alert('Unauthorized to delete this product.');
                     return;
                 }
-                
+        
                 // Prepare the request body
                 const requestBody = {
-                    product_name: productName,   // Correct key format
-                    product_price: productPrice, // Correct key format
-                    product_owner: productOwner  // Correct key format
+                    product_name: productName,
+                    product_price: productPrice,
+                    product_owner: productOwner
                 };
 
-                // Log the request body for debugging
                 console.log('Request Body:', requestBody);
 
                 const response = await fetch(`${server}/products`, {
-                    method: 'DELETE', // DELETE method
+                    method: 'DELETE',
                     headers: {
                         'Authorization': `Bearer ${bearerToken}`,
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify(requestBody) // Attach the request body
+                    body: JSON.stringify(requestBody)
                 });
 
                 // Parse the response
                 const responseData = await response.json();
-                console.log('Delete Product Response:', responseData); // Debugging step
+                console.log('Delete Product Response:', responseData);
 
                 if (!response.ok) {
                     throw new Error(`HTTP error! Status: ${response.status}`);
@@ -158,30 +198,50 @@
                 console.error('Error deleting product:', error);
             }
         }
-
-        async function buyProduct(productName, productPrice) {
+        
+        async function buyProduct(productName, productPrice, productOwner) {
             const bearerToken = localStorage.getItem('bearer_str');
             if (!bearerToken) {
                 alert('You must be logged in to buy products.');
                 return;
             }
 
+            // Decode JWT to extract the username from the token
+            const base64Url = bearerToken.split('.')[1];
+            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            const payload = JSON.parse(atob(base64));
+            const currentUser = payload['username'] || payload['cognito:username'];
+            
+            console.log('Current User:', currentUser);
+
+            if (!currentUser) {
+                alert('Failed to retrieve current user.');
+                return;
+            }
+
+            // Debugging: Log both values to see if they match
+            console.log('Product Owner:', productOwner);
+            console.log('Current User:', currentUser);
+
+            // Normalize the values (remove leading/trailing spaces, case-insensitive check)
+            const normalizedProductOwner = productOwner.trim().toLowerCase();
+            const normalizedCurrentUser = currentUser.trim().toLowerCase();
+
+            // Check if the logged-in user is the owner of the product
+            if (normalizedProductOwner === normalizedCurrentUser) {
+                alert('You cannot buy your own product!');
+                return;
+            }
+
             // Confirm purchase
-            const isConfirmed = confirm(`Are you sure you want to purchase "${productName}" for $${productPrice}? EW CRINGE!`);
+            const isConfirmed = confirm(`Are you sure you want to purchase "${productName}" for $${productPrice}?`);
             if (!isConfirmed) {
                 return;
             }
 
             try {
-                // Decode JWT to extract the user's email
-                const base64Url = bearerToken.split('.')[1]; // Extract payload from JWT
-                const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/'); // URL-safe to Base64
-                const payload = JSON.parse(atob(base64)); // Decode the Base64 string
-
-                // Log the decoded payload to ensure the email exists
-                console.log('Decoded Payload:', payload);
-
-                const userEmail = payload['email']; // Get the email from the token payload
+                // Get the user's email for the purchase
+                const userEmail = payload['email'];
 
                 if (!userEmail) {
                     console.error('Email not found in token payload.');
@@ -207,7 +267,7 @@
                     },
                     body: JSON.stringify(requestBody)
                 });
-    
+
                 if (!response.ok) {
                     throw new Error(`HTTP error! Status: ${response.status}`);
                 }
@@ -219,34 +279,24 @@
             }
         }
 
-        window.onload = function () {
+        window.onload = function() {
             updateAuthButton();
             fetchProductData();
         };
     </script>
 </head>
 <body>
-    <!-- Navbar -->
-    <div class="navbar">
-        <h1>Marketplace</h1>
-        <button id="authButton" class="auth-button" onclick="handleAuth()">Login</button>
-    </div>
-
-    <!-- Main Content -->
     <div class="container">
-        <h2>Products</h2>
-        <ul id="product-list" class="product-section">LOG IN TO VIEW PRODUCTS</ul>
-        <div class="add-product">
+        <h1>Click & Cringe: The Marketplace of Questionable Decisions</h1>
+        <button id="authButton" class="auth-button" onclick="handleAuth()">Login</button>
+        <div id="product" class="product-section">
+            <h2>Products</h2>
+            <ul id="product-list">LOG IN TO VIEW PRODUCTS</ul>
             <h3>Add a New Product</h3>
             <input type="text" id="product-name" placeholder="Product Name" />
             <input type="number" id="product-price" placeholder="Product Price" />
-            <button class="auth-button" onclick="addProduct()">Add Product</button>
+            <button onclick="addProduct()">Add Product</button>
         </div>
     </div>
-
-    <!-- Footer -->
-    <footer class="footer">
-        &copy; 2024 Marketplace. All rights reserved.
-    </footer>
 </body>
 </html>
