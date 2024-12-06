@@ -1,86 +1,247 @@
 /* General Styles */
 body {
-    font-family: 'Arial', sans-serif;
+    font-family: 'Roboto', sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #f4f4f4;
-    color: #333;
+    background: linear-gradient(-45deg, #d8cfc4, #a9a9a9, #8b8b8b, #c5b79f); /* Soft beige and gray gradient */
+    background-size: 400% 400%;
+    animation: gradientAnimation 12s ease infinite, backgroundMove 10s linear infinite;
+    color: #333; /* Dark gray text for readability */
     display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
     flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    min-height: 100vh;
+    overflow: auto;
 }
 
+@keyframes gradientAnimation {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+/* Adding background parallax effect */
+@keyframes backgroundMove {
+    0% {
+        background-position: 0% 50%;
+    }
+    100% {
+        background-position: 100% 50%;
+    }
+}
+
+/* Navbar */
+.navbar {
+    width: 100%;
+    background-color: #2f353b; /* Dark gray for navbar */
+    padding: 12px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.navbar a {
+    color: #f1f1f1; /* Light color for text */
+    text-decoration: none;
+    font-size: 1.1em;
+    padding: 0 15px;
+    font-weight: 500;
+    transition: color 0.3s, transform 0.2s;
+}
+
+.navbar a:hover {
+    color: #ff6f00; /* Vibrant orange for hover effect */
+    transform: scale(1.05);
+}
+
+/* Container */
 .container {
     width: 90%;
     max-width: 800px;
-    padding: 20px;
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 25px;
+    background-color: rgba(245, 245, 240, 0.9); /* Soft beige background for container */
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
     text-align: center;
+    margin-top: 30px;
+    transition: box-shadow 0.3s ease-in-out;
 }
 
-/* Header Styles */
+.container:hover {
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
 h1 {
-    font-size: 2.5em;
-    color: #333;
+    font-size: 2.6em;
+    color: #212121; /* Darker shade for better contrast */
     margin-bottom: 20px;
+    font-family: 'Montserrat', sans-serif;
+    letter-spacing: 1.2px;
+    font-weight: 700;
+    animation: titleMovement 3s ease-in-out infinite;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3); /* Optional: Adds a shadow for better readability */
+    background-color: rgba(255, 255, 255, 0.6); /* Light background with some transparency */
+    padding: 5px 10px; /* Optional: Adds padding around the title */
+}
+
+@keyframes titleMovement {
+    0% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+    100% {
+        transform: translateY(0);
+    }
 }
 
 h2 {
-    font-size: 1.8em;
-    color: #555;
-    margin-top: 20px;
+    font-size: 2em;
+    color: #666; /* Medium gray for sub-headings */
+    margin-top: 25px;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+}
+
+/* Paragraph */
+.container p {
+    font-size: 1.3em;
+    color: #707070; /* Lighter gray text for paragraphs */
+    margin-top: 15px;
+    line-height: 1.7;
+    font-weight: 400;
 }
 
 /* Button Styles */
 .auth-button {
-    padding: 10px 20px;
-    font-size: 1.2em;
+    padding: 12px 24px;
+    font-size: 1.3em;
     color: #fff;
-    background-color: #007bff;
+    background: linear-gradient(45deg, #ff6f00, #ff8f00); /* Vibrant orange gradient */
     border: none;
-    border-radius: 5px;
+    border-radius: 6px;
     cursor: pointer;
-    margin: 20px 0;
-    transition: background-color 0.3s ease;
+    margin: 25px 0;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s, background-color 0.3s, box-shadow 0.3s;
 }
 
 .auth-button:hover {
-    background-color: #0056b3;
+    transform: scale(1.08);
+    background: linear-gradient(45deg, #ff8f00, #ff6f00);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 /* Product Section */
 .product-section {
-    margin-top: 20px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 20px;
+    margin-top: 30px;
+    padding: 25px;
+    background-color: #b0bec5; /* Light gray-blue background */
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.product-section li {
+    list-style: none;
     padding: 20px;
-    background-color: #f9f9f9;
+    background-color: #607d8b; /* Dark gray-blue for product items */
     border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-ul {
-    list-style-type: none;
-    padding: 0;
-}
-
-li {
-    padding: 10px;
-    background-color: #fff;
-    margin: 5px 0;
-    border-radius: 5px;
+    text-align: center;
+    color: #e0e0e0; /* Lighter gray for product item text */
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s, background-color 0.3s, box-shadow 0.3s, font-size 0.3s;
 }
 
-li:hover {
-    background-color: #e9ecef;
+.product-section li:hover {
+    transform: translateY(-8px);
+    background-color: #455a64; /* Slightly lighter gray-blue on hover */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    font-size: 1.2em; /* Increase font size on hover */
+    color: #ff6f00; /* Change text color to vibrant orange on hover */
 }
 
-/* Logout Page */
-.container p {
-    font-size: 1.2em;
-    color: #777;
-    margin-top: 10px;
+/* Footer */
+.footer {
+    margin-top: 50px;
+    padding: 15px 20px;
+    background-color: #2f353b; /* Dark gray for footer */
+    color: #f1f1f1; /* Light text */
+    text-align: center;
+    font-size: 1em;
+    letter-spacing: 0.5px;
+}
+
+/* Dark Mode */
+body.dark-mode {
+    background-color: #212121; /* Darker background for dark mode */
+    color: #f5f5f5; /* Lighter text */
+}
+
+body.dark-mode .container {
+    background-color: #37474f; /* Darker background for container */
+}
+
+body.dark-mode .auth-button {
+    background-color: #ff6f00; /* Vibrant orange for dark mode */
+}
+
+body.dark-mode .auth-button:hover {
+    background-color: #e65100;
+}
+
+body.dark-mode .product-section li {
+    background-color: #455a64; /* Darker background for product items */
+}
+
+body.dark-mode .navbar {
+    background-color: #455a64; /* Dark gray for navbar */
+}
+
+body.dark-mode .footer {
+    background-color: #37474f; /* Dark footer for dark mode */
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    h1 {
+        font-size: 2.2em;
+    }
+
+    h2 {
+        font-size: 1.7em;
+    }
+
+    .container {
+        padding: 18px;
+    }
+
+    .auth-button {
+        font-size: 1.1em;
+        padding: 10px 20px;
+    }
+
+    .navbar a {
+        font-size: 1em;
+        padding: 0 10px;
+    }
+
+    .product-section {
+        padding: 15px;
+    }
 }

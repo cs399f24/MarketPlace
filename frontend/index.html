@@ -3,10 +3,11 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Marketplace</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <script>
-        const server = 'https://hdrq77dp7h.execute-api.us-east-1.amazonaws.com/prod';
-        const login_server = 'https://ss-2024-11-21.auth.us-east-1.amazoncognito.com/login?client_id=51h77vn3rse7n58bum9c8dd4bu&response_type=token&scope=email+openid&redirect_uri=https%3A%2F%2Fstaging.d3c6e5p4ore4dg.amplifyapp.com%2Fcallback.html';
+        const server = 'https://c2zk70xvb0.execute-api.us-east-1.amazonaws.com/prod';
+        const login_server = 'https://us-east-1dnkhqdwqn.auth.us-east-1.amazoncognito.com/login?client_id=366p3ejcn409h950vj86oqkc1l&response_type=token&scope=email+openid&redirect_uri=https%3A%2F%2Fstaging.d1rbyo11f08fn5.amplifyapp.com%2Fcallback.html';
 
         function handleAuth() {
             if (localStorage.getItem('bearer_str')) {
@@ -31,19 +32,14 @@
         async function fetchProductData() {
             const bearerToken = localStorage.getItem('bearer_str');
             if (!bearerToken) {
-                alert('You must be logged in to view products.');
+                document.getElementById('product-list').innerHTML = '<li>Please log in to view products.</li>';
                 return;
             }
-
             try {
                 const response = await fetch(`${server}/products/get_all_products`, {
-                    headers: {
-                        'Authorization': `Bearer ${bearerToken}`
-                    }
+                    headers: { 'Authorization': `Bearer ${bearerToken}` }
                 });
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
+                if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
                 const responseData = await response.json();
                 const data = JSON.parse(responseData.body);
 
@@ -53,12 +49,16 @@
                 if (Array.isArray(data)) {
                     data.forEach(product => {
                         const listItem = document.createElement('li');
-                        listItem.innerHTML = `Product: ${product.ProductName}, Price: ${product.ProductPrice}, Owner: ${product.ProductOwner} 
-                            <button onclick="deleteProduct('${product.ProductName}', '${product.ProductPrice}', '${product.ProductOwner}')">Delete</button>`;
+                        listItem.innerHTML = `
+                            <strong>${product.ProductName}</strong><br>
+                            Price: $${product.ProductPrice}<br>
+                            Owner: ${product.ProductOwner}
+                            <button class="auth-button" onclick="deleteProduct('${product.ProductName}', '${product.ProductPrice}', '${product.ProductOwner}')">Delete</button>
+                        `;
                         listElement.appendChild(listItem);
                     });
                 } else {
-                    console.error('Data is not an array:', data);
+                    listElement.innerHTML = '<li>No products available.</li>';
                 }
             } catch (error) {
                 console.error('Error fetching product data:', error);
@@ -67,153 +67,62 @@
 
         async function addProduct() {
             const bearerToken = localStorage.getItem('bearer_str');
-            if (!bearerToken) {
-                alert('You must be logged in to add a product.');
-                return;
-            }
-
+            if (!bearerToken) return alert('You must be logged in to add a product.');
             const productName = document.getElementById('product-name').value.trim();
             const productPrice = document.getElementById('product-price').value.trim();
-
-            if (!productName || !productPrice) {
-                alert('Please provide both product name and price.');
-                return;
-            }
+            if (!productName || !productPrice) return alert('Please fill in both fields.');
 
             try {
-                // Decode JWT to extract the username
-                const base64Url = bearerToken.split('.')[1]; // Extract payload from JWT
-                const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/'); // URL-safe to Base64
-                const payload = JSON.parse(atob(base64)); // Decode the Base64 string
-                console.log('Decoded Payload:', payload); // Debugging step
+                const base64Url = bearerToken.split('.')[1];
+                const payload = JSON.parse(atob(base64Url));
+                const username = payload['username'] || payload['cognito:username'];
 
-                const username = payload['username'] || payload['cognito:username']; // Adjust key as needed
-                if (!username) {
-                    alert('Failed to retrieve username from token. Ensure you are logged in.');
-                    return;
-                }
-
-                // Log username for debugging
-                console.log('Username:', username);
-
-                // Make API call to add the product
-                const requestBody = {
-                    product_name: productName,   // Correct key format
-                    product_price: productPrice, // Correct key format
-                    product_owner: username      // Correct key format
-                };
-
-                // Log request body for debugging
-                console.log('Request Body:', requestBody);
-
-                const response = await fetch(`${server}/products`, {
+                await fetch(`${server}/products`, {
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${bearerToken}`,
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify(requestBody)
+                    body: JSON.stringify({ product_name: productName, product_price: productPrice, product_owner: username })
                 });
 
-                const responseData = await response.json();
-                console.log('Add Product Response:', responseData); // Debugging step
-
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-
                 alert('Product added successfully!');
-
-                // Clear input fields
                 document.getElementById('product-name').value = '';
                 document.getElementById('product-price').value = '';
-    
-                // Refresh product list
                 fetchProductData();
             } catch (error) {
                 console.error('Error adding product:', error);
-                alert('Failed to add product. Please try again.');
             }
         }
 
-        async function deleteProduct(productName, productPrice, productOwner) {
-            const bearerToken = localStorage.getItem('bearer_str');
-            if (!bearerToken) {
-                alert('You must be logged in to delete products.');
-                return;
-            }
-
-            try {
-                // Decode the JWT token to get the current user
-                const base64Url = bearerToken.split('.')[1];
-                const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-                const payload = JSON.parse(atob(base64));
-
-                const currentUser = payload['username'] || payload['cognito:username'];
-
-                if (!currentUser) {
-                    alert('Failed to retrieve current user.');
-                    return;
-                }
-
-                // Check if the logged-in user is the owner of the product
-                if (productOwner !== currentUser) {
-                    alert('Unauthorized to delete this product.');
-                    return;
-                }
-                
-                // Prepare the request body
-                const requestBody = {
-                    product_name: productName,   // Correct key format
-                    product_price: productPrice, // Correct key format
-                    product_owner: productOwner  // Correct key format
-                };
-
-                // Log the request body for debugging
-                console.log('Request Body:', requestBody);
-
-                const response = await fetch(`${server}/products`, {
-                    method: 'DELETE', // DELETE method
-                    headers: {
-                        'Authorization': `Bearer ${bearerToken}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(requestBody) // Attach the request body
-                });
-
-                // Parse the response
-                const responseData = await response.json();
-                console.log('Delete Product Response:', responseData); // Debugging step
-
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-
-                alert('Product deleted successfully!');
-                fetchProductData();
-            } catch (error) {
-                console.error('Error deleting product:', error);
-            }
-        }
-
-        window.onload = function() {
+        window.onload = function () {
             updateAuthButton();
             fetchProductData();
         };
     </script>
 </head>
 <body>
-    <div class="container">
-        <h1>Welcome to the Marketplace!</h1>
+    <!-- Navbar -->
+    <div class="navbar">
+        <h1>Marketplace</h1>
         <button id="authButton" class="auth-button" onclick="handleAuth()">Login</button>
-        <div id="product" class="product-section">
-            <h2>Products</h2>
-            <ul id="product-list">LOG IN TO VIEW PRODUCTS</ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        <h2>Products</h2>
+        <ul id="product-list" class="product-section">LOG IN TO VIEW PRODUCTS</ul>
+        <div class="add-product">
             <h3>Add a New Product</h3>
             <input type="text" id="product-name" placeholder="Product Name" />
             <input type="number" id="product-price" placeholder="Product Price" />
-            <button onclick="addProduct()">Add Product</button>
+            <button class="auth-button" onclick="addProduct()">Add Product</button>
         </div>
     </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        &copy; 2024 Marketplace. All rights reserved.
+    </footer>
 </body>
 </html>
