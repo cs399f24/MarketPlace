@@ -96,6 +96,66 @@
             }
         }
 
+        async function deleteProduct(productName, productPrice, productOwner) {
+            const bearerToken = localStorage.getItem('bearer_str');
+            if (!bearerToken) {
+                alert('You must be logged in to delete products.');
+                return;
+            }
+
+            try {
+                // Decode the JWT token to get the current user
+                const base64Url = bearerToken.split('.')[1];
+                const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                const payload = JSON.parse(atob(base64));
+
+                const currentUser = payload['username'] || payload['cognito:username'];
+
+                if (!currentUser) {
+                    alert('Failed to retrieve current user.');
+                    return;
+                }
+
+                // Check if the logged-in user is the owner of the product
+                if (productOwner !== currentUser) {
+                    alert('Unauthorized to delete this product.');
+                    return;
+                }
+                
+                // Prepare the request body
+                const requestBody = {
+                    product_name: productName,   // Correct key format
+                    product_price: productPrice, // Correct key format
+                    product_owner: productOwner  // Correct key format
+                };
+
+                // Log the request body for debugging
+                console.log('Request Body:', requestBody);
+
+                const response = await fetch(`${server}/products`, {
+                    method: 'DELETE', // DELETE method
+                    headers: {
+                        'Authorization': `Bearer ${bearerToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(requestBody) // Attach the request body
+                });
+
+                // Parse the response
+                const responseData = await response.json();
+                console.log('Delete Product Response:', responseData); // Debugging step
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+
+                alert('Product deleted successfully!');
+                fetchProductData();
+            } catch (error) {
+                console.error('Error deleting product:', error);
+            }
+        }
+
         window.onload = function () {
             updateAuthButton();
             fetchProductData();
