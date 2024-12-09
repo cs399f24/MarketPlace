@@ -286,17 +286,27 @@
     </script>
 </head>
 <body>
-    <div class="container">
+    <!-- Navbar -->
+    <div class="navbar">
         <h1>Click & Cringe: The Marketplace of Questionable Decisions</h1>
         <button id="authButton" class="auth-button" onclick="handleAuth()">Login</button>
-        <div id="product" class="product-section">
-            <h2>Products</h2>
-            <ul id="product-list">LOG IN TO VIEW PRODUCTS</ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        <h2>Products</h2>
+        <ul id="product-list" class="product-section">LOG IN TO VIEW PRODUCTS</ul>
+        <div class="add-product">
             <h3>Add a New Product</h3>
             <input type="text" id="product-name" placeholder="Product Name" />
             <input type="number" id="product-price" placeholder="Product Price" />
-            <button onclick="addProduct()">Add Product</button>
+            <button class="auth-button" onclick="addProduct()">Add Product</button>
         </div>
     </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        &copy; 2024 Marketplace. All rights reserved.
+    </footer>
 </body>
 </html>
