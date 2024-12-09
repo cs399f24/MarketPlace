@@ -25,6 +25,7 @@
             const authButton = document.getElementById('authButton');
             if (localStorage.getItem('bearer_str')) {
                 authButton.innerText = "Logout";
+                subscribeUser();
             } else {
                 authButton.innerText = "Login";
             }
@@ -276,6 +277,69 @@
             } catch (error) {
                 console.error('Error processing purchase:', error);
                 alert('Failed to complete the purchase. Please try again.');
+            }
+        }
+
+        async function subscribeUser() {
+            const bearerToken = localStorage.getItem('bearer_str');
+            if (!bearerToken) {
+                console.error("Bearer token not found. Subscription cannot proceed.");
+                return;
+            }
+
+            try {
+                // Decode the JWT to extract the user's email
+                const base64Url = bearerToken.split('.')[1];
+                const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                const payload = JSON.parse(atob(base64));
+                const userEmail = payload['email'];
+
+                if (!userEmail) {
+                    console.error("Email not found in token payload.");
+                    alert("Failed to retrieve email. Subscription cannot proceed.");
+                    return;
+                }
+
+                // Make the subscription request
+                const requestBody = {
+                    user_email: userEmail
+                };
+
+                // Log request body for debugging
+                console.log('Request Body:', requestBody);
+
+                const response = await fetch(`${server}/subscribe`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${bearerToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(requestBody)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+
+                const responseData = await response.json();
+                console.log("Subscription Response:", responseData);
+
+                // Parse the body JSON string
+                const responseBody = JSON.parse(responseData.body);
+                console.log("Parsed Response Body:", responseBody);
+
+                // Handle response based on parsed message
+                if (responseBody.message && responseBody.message.includes('already subscribed')) {
+                    alert(`Email ${userEmail} is already subscribed to the topic.`);
+                } else if (responseBody.message && responseBody.message.includes('Subscription request sent')) {
+                    alert(`Subscription request sent! Please confirm the subscription in your email (${userEmail}).`);
+                } else {
+                    console.error("Unexpected response structure:", responseBody);
+                    alert("Unexpected response from the server.");
+                }
+            } catch (error) {
+                console.error("Error subscribing user:", error);
+                alert("Failed to subscribe. Please try again.");
             }
         }
 

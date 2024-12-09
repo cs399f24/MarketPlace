@@ -1,10 +1,10 @@
 #!/bin/bash
 
-# Set Lambda function name and role name
-FUNCTION_NAME="createUser"
+# Set Lambda function name, role name, and zip file
+FUNCTION_NAME="subscribe"
 ROLE_NAME="LabRole"
-ZIP_FILE="../zip_files/Post_User_Lambda.zip"
-PYTHON_FILE="Post_User_Lambda.py"
+ZIP_FILE="../zip_files/Post_Subscribe_Lambda.zip"
+PYTHON_FILE="Post_Subscribe_Lambda.py"
 
 # Check if the Lambda function already exists
 if aws lambda get-function --function-name $FUNCTION_NAME >/dev/null 2>&1; then
@@ -22,7 +22,8 @@ if [ "$ROLE" == "None" ]; then
 fi
 
 # Create a ZIP file with the Python code
-zip $ZIP_FILE $PYTHON_FILE
+echo "Creating ZIP file..."
+zip -r $ZIP_FILE $PYTHON_FILE
 
 # Create the Lambda function
 echo "Creating Lambda function '$FUNCTION_NAME'..."
@@ -31,13 +32,15 @@ aws lambda create-function \
   --runtime python3.13 \
   --role $ROLE \
   --zip-file fileb://$ZIP_FILE \
-  --handler Post_User_Lambda.lambda_handler \
+  --handler Post_Subscribe_Lambda.lambda_handler \
   --region us-east-1
 
 # Wait for the function to be created and active
+echo "Waiting for function to be active..."
 aws lambda wait function-active --function-name $FUNCTION_NAME
 
 # Publish a new version of the Lambda function
+echo "Publishing function version..."
 aws lambda publish-version --function-name $FUNCTION_NAME
 
 echo "Lambda function '$FUNCTION_NAME' created and version published successfully!"
