@@ -18,6 +18,7 @@ An online web application that allows users to interact with each other in a vir
 
 ### DynamoDB
 * Create Dynamo Table (Only if needed)
+     * Make sure name of database is **MarketPlaceDatabase**
      * Go to the dynamodb Directory using `cd MarketPlace/dynamodb`
      * Grant permissions to create_dynamodb_table.sh: `chmod +x create_dynamodb_table.sh`
      * Run the script: `./create_dynamodb_table.sh`
@@ -36,7 +37,7 @@ An online web application that allows users to interact with each other in a vir
 ### S3
 * Make sure you have an S3 bucket in which you would like to place necessary files
      * Create S3 bucket (if needed)
-          * Navigate to s3_bucket folder
+          * Navigate to *s3_bucket folder*
           * In the `create_bucket.sh` script, replace the <bucket-name> field with a unique bucket name
           * Grant permissions: `chmod +x create_bucket.sh`
           * Run the script: `./create_bucket.sh`
