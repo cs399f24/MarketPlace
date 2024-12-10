@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Disable AWS CLI pager
+export AWS_PAGER=""
+
 # Set API Gateway and Lambda function names
 API_NAME="MarketPlaceAPI"
 LAMBDA_CREATE_PRODUCT="createProduct"
@@ -18,9 +21,13 @@ ACCOUNT_ID=$(aws sts get-caller-identity --query "Account" --output text)
 # Define the lab role ARN (replace with the actual ARN of your "lab role")
 LAB_ROLE_ARN="arn:aws:iam::${ACCOUNT_ID}:role/LabRole"
 
+# Get Cognito User Pool ID based on the name
+COGNITO_USER_POOL_NAME="FinalMarketPlace" # Replace with your actual Cognito User Pool name
+COGNITO_USER_POOL_ID=$(aws cognito-idp list-user-pools --max-results 60 --region $REGION --query "UserPools[?Name=='$COGNITO_USER_POOL_NAME'].Id" --output text)
+
 # Get Cognito User Pool ARN
 COGNITO_USER_POOL_ARN=$(aws cognito-idp describe-user-pool \
-  --user-pool-id FinalMarketPlace \
+  --user-pool-id $COGNITO_USER_POOL_ID \
   --region $REGION \
   --query "UserPool.Arn" --output text)
 
@@ -66,7 +73,18 @@ aws apigateway put-method \
   --rest-api-id $API_ID \
   --region $REGION \
   --resource-id $PRODUCTS_RESOURCE_ID \
-  --http-method OPTIONS
+  --http-method OPTIONS \
+  --authorization-type COGNITO_USER_POOLS \
+  --authorizer-id $AUTHORIZER_ID
+  
+# Integrate OPTIONS method with mock integration
+aws apigateway put-integration \
+  --rest-api-id $API_ID \
+  --region $REGION \
+  --resource-id $PRODUCTS_RESOURCE_ID \
+  --http-method OPTIONS \
+  --type MOCK \
+  --request-templates "{\"application/json\": \"{\\\"statusCode\\\": 200}\"}"
 
 # Add Method Response for 200 status code
 aws apigateway put-method-response \
@@ -91,6 +109,7 @@ aws apigateway put-method \
   --rest-api-id $API_ID \
   --region $REGION \
   --resource-id $PRODUCTS_RESOURCE_ID \
+  --http-method POST \
   --authorization-type COGNITO_USER_POOLS \
   --authorizer-id $AUTHORIZER_ID
 
@@ -193,7 +212,18 @@ aws apigateway put-method \
   --rest-api-id $API_ID \
   --region $REGION \
   --resource-id $GET_ALL_PRODUCTS_RESOURCE_ID \
-  --http-method OPTIONS
+  --http-method OPTIONS \
+  --authorization-type COGNITO_USER_POOLS \
+  --authorizer-id $AUTHORIZER_ID
+
+# Integrate OPTIONS method with mock integration
+aws apigateway put-integration \
+  --rest-api-id $API_ID \
+  --region $REGION \
+  --resource-id $PRODUCTS_RESOURCE_ID \
+  --http-method OPTIONS \
+  --type MOCK \
+  --request-templates "{\"application/json\": \"{\\\"statusCode\\\": 200}\"}"
 
 # Add Method Response for 200 status code
 aws apigateway put-method-response \
@@ -321,7 +351,18 @@ aws apigateway put-method \
   --rest-api-id $API_ID \
   --region $REGION \
   --resource-id $PURCHASE_RESOURCE_ID \
-  --http-method OPTIONS
+  --http-method OPTIONS \
+  --authorization-type COGNITO_USER_POOLS \
+  --authorizer-id $AUTHORIZER_ID
+
+# Integrate OPTIONS method with mock integration
+aws apigateway put-integration \
+  --rest-api-id $API_ID \
+  --region $REGION \
+  --resource-id $PRODUCTS_RESOURCE_ID \
+  --http-method OPTIONS \
+  --type MOCK \
+  --request-templates "{\"application/json\": \"{\\\"statusCode\\\": 200}\"}"
 
 # Add Method Response for 200 status code
 aws apigateway put-method-response \
@@ -402,8 +443,19 @@ aws apigateway put-method \
   --rest-api-id $API_ID \
   --region $REGION \
   --resource-id $SUBSCRIBE_RESOURCE_ID \
-  --http-method OPTIONS
+  --http-method OPTIONS \
+  --authorization-type COGNITO_USER_POOLS \
+  --authorizer-id $AUTHORIZER_ID
 
+# Integrate OPTIONS method with mock integration
+aws apigateway put-integration \
+  --rest-api-id $API_ID \
+  --region $REGION \
+  --resource-id $PRODUCTS_RESOURCE_ID \
+  --http-method OPTIONS \
+  --type MOCK \
+  --request-templates "{\"application/json\": \"{\\\"statusCode\\\": 200}\"}"
+  
 # Add Method Response for 200 status code
 aws apigateway put-method-response \
   --rest-api-id $API_ID \

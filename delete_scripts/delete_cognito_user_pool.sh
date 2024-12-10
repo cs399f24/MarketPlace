@@ -29,9 +29,44 @@ else
     echo "App Client deleted."
 fi
 
+# Delete domain associated with the User Pool (if any)
+DOMAIN=$(aws cognito-idp describe-user-pool --user-pool-id "$USER_POOL_ID" --region $REGION \
+    --query "UserPool.Domain" --output text)
+
+if [ "$DOMAIN" != "None" ] && [ -n "$DOMAIN" ]; then
+    echo "Found domain: $DOMAIN"
+    echo "Deleting domain..."
+    aws cognito-idp delete-user-pool-domain --user-pool-id "$USER_POOL_ID" --domain "$DOMAIN" --region $REGION
+    if [ $? -eq 0 ]; then
+        echo "Domain deleted successfully."
+    else
+        echo "Failed to delete domain. Exiting."
+        exit 1
+    fi
+else
+    echo "No domain associated with the User Pool."
+fi
+
+# Disable delete protection for the User Pool
+echo "Disabling delete protection for User Pool..."
+aws cognito-idp update-user-pool --user-pool-id "$USER_POOL_ID" --deletion-protection INACTIVE --region $REGION
+
+# Check if disabling delete protection was successful
+if [ $? -eq 0 ]; then
+    echo "Delete protection disabled successfully."
+else
+    echo "Failed to disable delete protection. Exiting."
+    exit 1
+fi
+
 # Delete the User Pool
 echo "Deleting User Pool '$USER_POOL_NAME'..."
 aws cognito-idp delete-user-pool --user-pool-id "$USER_POOL_ID" --region $REGION
-echo "User Pool deleted."
+if [ $? -eq 0 ]; then
+    echo "User Pool deleted."
+else
+    echo "Failed to delete User Pool."
+    exit 1
+fi
 
 echo "Cognito resources cleanup completed!"
