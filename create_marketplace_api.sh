@@ -220,7 +220,7 @@ aws apigateway put-method \
 aws apigateway put-integration \
   --rest-api-id $API_ID \
   --region $REGION \
-  --resource-id $PRODUCTS_RESOURCE_ID \
+  --resource-id $GET_ALL_PRODUCTS_RESOURCE_ID \
   --http-method OPTIONS \
   --type MOCK \
   --request-templates "{\"application/json\": \"{\\\"statusCode\\\": 200}\"}"
@@ -359,7 +359,7 @@ aws apigateway put-method \
 aws apigateway put-integration \
   --rest-api-id $API_ID \
   --region $REGION \
-  --resource-id $PRODUCTS_RESOURCE_ID \
+  --resource-id $PURCHASE_RESOURCE_ID \
   --http-method OPTIONS \
   --type MOCK \
   --request-templates "{\"application/json\": \"{\\\"statusCode\\\": 200}\"}"
@@ -451,7 +451,7 @@ aws apigateway put-method \
 aws apigateway put-integration \
   --rest-api-id $API_ID \
   --region $REGION \
-  --resource-id $PRODUCTS_RESOURCE_ID \
+  --resource-id $SUBSCRIBE_RESOURCE_ID \
   --http-method OPTIONS \
   --type MOCK \
   --request-templates "{\"application/json\": \"{\\\"statusCode\\\": 200}\"}"
