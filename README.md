@@ -66,6 +66,8 @@ An online web application that allows users to interact with each other in a vir
 * Create API 
      * Grant permissions to create_marketplace_api.sh: `chmod +x create_marketplace_api.sh`
      * Run the script: `./create_marketplace_api.sh`
+     * Navigate to the **API Gateway Console** and go to the newly created API Gateway, *MarketPlaceAPI*
+     * Enable **CORS** for each individual resource and redeploy the API once done
 
 * Modify index.html
      * Replace **const server** field with your **API invoke url**
