@@ -7,9 +7,13 @@
     <link rel="stylesheet" href="style.css">
     <script>
         
+        // Replace with your API ID
         const server = 'https://<API-ID>.execute-api.us-east-1.amazonaws.com/prod'; // Replace with your API ID
+        
+        // Replace with your Cognito domain, client ID, and CloudFront domain
         const login_server = 'https://<COGNITO-DOMAIN>.auth.us-east-1.amazoncognito.com/login?client_id=<CLIENT-ID>&response_type=token&scope=aws.cognito.signin.user.admin+email+openid+phone+profile&redirect_uri=https://<CLOUDFRONT-DOMAIN>/index.html';
 
+        // Function to handle login/logout
         function handleAuth() {
             if (localStorage.getItem('bearer_str')) {
                 localStorage.removeItem('bearer_str');
@@ -21,6 +25,7 @@
             }
         }
 
+        // Function to update the login/logout button
         function updateAuthButton() {
             const authButton = document.getElementById('authButton');
             if (localStorage.getItem('bearer_str')) {
@@ -31,6 +36,7 @@
             }
         }
 
+        // Function to fetch product data
         async function fetchProductData() {
             const bearerToken = localStorage.getItem('bearer_str');
             if (!bearerToken) {
@@ -70,6 +76,7 @@
             }
         }
 
+        // Function to add a new product
         async function addProduct() {
             const bearerToken = localStorage.getItem('bearer_str');
             if (!bearerToken) {
@@ -141,6 +148,7 @@
             }
         }
 
+        // Function to delete a product
         async function deleteProduct(productName, productPrice, productOwner) {
             const bearerToken = localStorage.getItem('bearer_str');
             if (!bearerToken) {
@@ -200,6 +208,7 @@
             }
         }
         
+        // Function to buy a product
         async function buyProduct(productName, productPrice, productOwner) {
             const bearerToken = localStorage.getItem('bearer_str');
             if (!bearerToken) {
@@ -280,6 +289,7 @@
             }
         }
 
+        // Function to subscribe the user to the SNS topic
         async function subscribeUser() {
             const bearerToken = localStorage.getItem('bearer_str');
             if (!bearerToken) {

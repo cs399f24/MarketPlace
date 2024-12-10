@@ -50,7 +50,7 @@ class DynamoDBMarketPlace:
             print(f"Unhandled error: {e}")
             return False
 
-
+# Lambda handler function
 def lambda_handler(event, context):
     product_name = event.get('product_name')
     product_price = event.get('product_price')
