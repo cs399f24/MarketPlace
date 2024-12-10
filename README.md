@@ -5,18 +5,6 @@ An online web application that allows users to interact with each other in a vir
 ## System Architecture
 ![System Diagram](https://github.com/cs399f24/MarketPlace/blob/main/MarketPlaceFinalArchitecture.png)
 
-## Local Deployment:
-
-* Set up a virtual environment
-
-* Install requirements.txt
-
-* Launch in the terminal by running `python3 app.py`
-
-* Navigate to `http://192.168.1.122:5000` to view page
-
-* Stop using `CRTL+C` as prompted
-
 ## AWS Deployment:
 
 * Create AWS VPC:
