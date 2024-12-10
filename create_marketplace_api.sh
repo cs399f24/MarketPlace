@@ -2,8 +2,6 @@
 
 # Set API Gateway and Lambda function names
 API_NAME="MarketPlaceAPI"
-LAMBDA_CREATE_USER="createUser"
-LAMBDA_GET_USER="getUser"
 LAMBDA_CREATE_PRODUCT="createProduct"
 LAMBDA_GET_PRODUCT="getProduct"
 LAMBDA_GET_ALL_PRODUCTS="getAllProducts"

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the Lambda function names
-LAMBDA_FUNCTIONS=("getAllProducts" "getProduct" "getUser" "createProduct" "createUser")
+LAMBDA_FUNCTIONS=("getAllProducts" "getProduct" "createProduct" "deleteProduct" "purchaseProduct" "subscribe")
 
 # Set the AWS region
 REGION="us-east-1"

@@ -1,9 +1,8 @@
 #!/bin/bash
 
 # Variables
-USER_POOL_NAME="MarketPlace-UserPool"
-APP_CLIENT_NAME="marketplace-app-client"
-DOMAIN_PREFIX="marketplace-domain"
+USER_POOL_NAME="FinalMarketPlace"
+APP_CLIENT_NAME="MarketWebApp"
 REGION="us-east-1"  # Modify if necessary
 
 # Get the User Pool ID by name
@@ -29,11 +28,6 @@ else
     aws cognito-idp delete-user-pool-client --user-pool-id "$USER_POOL_ID" --client-id "$APP_CLIENT_ID" --region $REGION
     echo "App Client deleted."
 fi
-
-# Delete the Hosted UI Domain
-echo "Deleting Hosted UI Domain with prefix '$DOMAIN_PREFIX'..."
-aws cognito-idp delete-user-pool-domain --domain "$DOMAIN_PREFIX" --user-pool-id "$USER_POOL_ID" --region $REGION
-echo "Hosted UI Domain deleted."
 
 # Delete the User Pool
 echo "Deleting User Pool '$USER_POOL_NAME'..."
